@@ -4,7 +4,6 @@ import { useAuth } from "../../contexts/AuthContext";
 import {
   getDashboardStats,
   getAllResults,
-  getTrainHistory,
 } from "../../services/api";
 import { MdPeople, MdWarning, MdTrendingUp, MdAnalytics } from "react-icons/md";
 import anh1 from "./anh1.png";
@@ -45,17 +44,14 @@ export default function Dashboard() {
     total_taikhoan: 0,
   });
   const [latestResults, setLatestResults] = useState([]);
-  const [trainHistory, setTrainHistory] = useState([]);
-  const [selectedTree, setSelectedTree] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
       try {
-        const [sRes, dRes, tRes] = await Promise.all([
+        const [sRes, dRes] = await Promise.all([
           getDashboardStats(),
-          getAllResults(user?.id, "all"),
-          getTrainHistory(),
+          getAllResults(),
         ]);
         setStats(sRes.data);
 
@@ -72,9 +68,6 @@ export default function Dashboard() {
         const latest = Object.values(map);
         setLatestResults(latest);
 
-        const historyData = tRes.data || [];
-        setTrainHistory(historyData);
-        setSelectedTree(historyData[0] || null);
       } catch {}
       setLoading(false);
     }
@@ -98,9 +91,6 @@ export default function Dashboard() {
     ? ((atRisk / latestResults.length) * 100).toFixed(2)
     : 0;
 
-  const handleSelectTree = (item) => {
-    setSelectedTree(item);
-  };
   return (
     <div>
       <div className="page-header">
@@ -174,74 +164,6 @@ export default function Dashboard() {
             }}
           />
         </div>
-      </div>
-
-      {/* Decision tree section */}
-      <div className="card card-body">
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: 16,
-          }}
-        >
-          <div>
-            <div className="chart-title">Cây quyết định hiện tại</div>
-            <div className="chart-sub">
-              Hiển thị cấu trúc cây hiệu chỉnh giống như Streamlit
-            </div>
-          </div>
-          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-            {trainHistory.map((item, idx) => (
-              <button
-                key={item.version || idx}
-                className={`btn btn-outline btn-xs ${
-                  selectedTree?.version === item.version ? "active" : ""
-                }`}
-                onClick={() => handleSelectTree(item)}
-              >
-                {item.version || `v${idx + 1}`}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {loading ? (
-          <div className="spinner" />
-        ) : selectedTree ? (
-          <div
-            style={{
-              maxHeight: 380,
-              overflow: "auto",
-              background: "#0f172a",
-              color: "#e2e8f0",
-              borderRadius: 12,
-              padding: 18,
-              fontSize: 12,
-              lineHeight: 1.5,
-            }}
-          >
-            <pre
-              style={{
-                margin: 0,
-                whiteSpace: "pre-wrap",
-                wordBreak: "break-word",
-              }}
-            >
-              {JSON.stringify(
-                selectedTree.tree_rules || { message: "Không có dữ liệu cây." },
-                null,
-                2,
-              )}
-            </pre>
-          </div>
-        ) : (
-          <div style={{ color: "var(--text-secondary)", padding: 14 }}>
-            Chưa có cây quyết định để hiển thị. Hãy đồng bộ cây hoặc huấn luyện
-            mới.
-          </div>
-        )}
       </div>
     </div>
   );

@@ -48,14 +48,16 @@ export default function UploadAI() {
     if (f && f.name.endsWith(".csv")) handleFile(f);
   };
 
+  const [tenDot, setTenDot] = useState("");
+
   const handleUpload = async () => {
     if (!file) return;
     setLoading(true);
     try {
-      const r = await uploadPredict(file, user?.id);
+      const r = await uploadPredict(file, user?.id, tenDot || undefined);
       setResult({
         type: "success",
-        text: r.data?.message || "Phân tích hoàn tất!",
+        text: r.data?.message || `Phân tích hoàn tất! Batch ID: ${r.data?.batch_id}`,
       });
     } catch (err) {
       setResult({
@@ -91,7 +93,7 @@ export default function UploadAI() {
           }}
         >
           Tải lên danh sách sinh viên bằng file CSV để hệ thống AI tự động quét,
-          phân tích 11 thuộc tính và dự báo mức độ rủi ro học tập.
+          phân tích <strong>13 thuộc tính</strong> và dự báo mức độ rủi ro học tập.
         </p>
       </div>
 
@@ -245,6 +247,19 @@ export default function UploadAI() {
                 </div>
               )}
             </div>
+
+            {/* Tên đợt dự báo */}
+            {file && (
+              <div style={{ marginBottom: 12 }}>
+                <label style={{ fontSize: 13, fontWeight: 700, color: "#374151", display: "block", marginBottom: 6 }}>Tên đợt dự báo (tuỳ chọn)</label>
+                <input
+                  type="text" value={tenDot}
+                  onChange={e => setTenDot(e.target.value)}
+                  placeholder="VD: Học kỳ 1 - 2024"
+                  style={{ width: "100%", padding: "10px 14px", borderRadius: 8, border: "1.5px solid #e2e8f0", fontSize: 14, boxSizing: "border-box" }}
+                />
+              </div>
+            )}
 
             {/* Nút hành động */}
             {file && (
@@ -485,21 +500,23 @@ export default function UploadAI() {
                 marginBottom: "12px",
               }}
             >
-              11 THUỘC TÍNH AI (FEATURES)
+              13 THUỘC TÍNH AI (FEATURES)
             </div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
               {[
-                "Attendance",
-                "Hours_Studied",
-                "Previous_Scores",
-                "Sleep_Hours",
-                "Access_to_Resources",
-                "Motivation_Level",
-                "Family_Income",
-                "Peer_Influence",
-                "Extracurricular_Activities",
-                "Distance_from_Home",
-                "Teacher_Quality",
+                "thoi_gian_tu_hoc",
+                "chuyen_can",
+                "diem_qua_trinh",
+                "hoan_thanh_bai_tap",
+                "loai_mon_hoc",
+                "tai_lieu_on_tap",
+                "hinh_thuc_thi",
+                "tre_hoc_phi",
+                "ho_tro",
+                "tre_hoc",
+                "hoc_nhom",
+                "lam_them",
+                "co_kinh_nghiem",
               ].map((col) => (
                 <span
                   key={col}

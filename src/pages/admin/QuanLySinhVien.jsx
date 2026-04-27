@@ -278,20 +278,19 @@ export default function QuanLySinhVien() {
 
   const detailRows = selected
     ? [
-        { label: "Chuyên cần", value: `${selected.attendance || 0}%` },
-        { label: "Giờ học", value: `${selected.hours_studied || 0}h` },
-        { label: "Điểm cũ", value: selected.previous_scores || 0 },
-        { label: "Tài liệu", value: selected.access_to_resources || "N/A" },
-        { label: "Động lực", value: selected.motivation_level || "N/A" },
-        { label: "Thu nhập", value: selected.family_income || "N/A" },
-        { label: "Giờ ngủ", value: `${selected.sleep_hours || 0}h` },
-        { label: "Bạn bè", value: selected.peer_influence || "N/A" },
-        {
-          label: "Ngoại khóa",
-          value: selected.extracurricular_activities || "N/A",
-        },
-        { label: "Khoảng cách", value: selected.distance_from_home || "N/A" },
-        { label: "Chất lượng GV", value: selected.teacher_quality || "N/A" },
+        { label: "Chuyên cần", value: `${selected.chuyen_can || 0}` },
+        { label: "Thời gian tự học", value: `${selected.thoi_gian_tu_hoc || 0}h` },
+        { label: "Điểm quá trình", value: selected.diem_qua_trinh || 0 },
+        { label: "Hoàn thành BT", value: `${selected.hoan_thanh_bai_tap || 0}%` },
+        { label: "Trễ học", value: `${selected.tre_hoc || 0} buổi` },
+        { label: "Loại môn học", value: selected.loai_mon_hoc || "N/A" },
+        { label: "Tài liệu", value: selected.tai_lieu_on_tap || "N/A" },
+        { label: "Hình thức thi", value: selected.hinh_thuc_thi || "N/A" },
+        { label: "Trễ học phí", value: selected.tre_hoc_phi || "N/A" },
+        { label: "Hỗ trợ", value: selected.ho_tro || "N/A" },
+        { label: "Học nhóm", value: selected.hoc_nhom || "N/A" },
+        { label: "Làm thêm", value: selected.lam_them || "N/A" },
+        { label: "Có kinh nghiệm", value: selected.co_kinh_nghiem || "N/A" },
       ]
     : [];
 
@@ -391,37 +390,23 @@ export default function QuanLySinhVien() {
   const riskScoreColors = ["#22c55e", "#f59e0b", "#ef4444"];
 
   const chartCards = [
-    { title: "Chuyên cần", data: avgByRiskLevel("attendance"), colorIndex: 1 },
-    { title: "Giờ học", data: avgByRiskLevel("hours_studied"), colorIndex: 2 },
-    {
-      title: "Điểm cũ",
-      data: avgByRiskLevel("previous_scores"),
-      colorIndex: 3,
-    },
-    { title: "Giờ ngủ", data: avgByRiskLevel("sleep_hours"), colorIndex: 4 },
-    {
-      title: "Khoảng cách",
-      data: countBy("distance_from_home"),
-      colorIndex: 5,
-    },
-    { title: "Tài liệu", data: countBy("access_to_resources"), colorIndex: 0 },
-    { title: "Động lực", data: countBy("motivation_level"), colorIndex: 1 },
-    { title: "Thu nhập", data: countBy("family_income"), colorIndex: 2 },
-    {
-      title: "Ảnh hưởng bạn bè",
-      data: countBy("peer_influence"),
-      colorIndex: 3,
-    },
-    {
-      title: "Ngoại khóa",
-      data: countBy("extracurricular_activities"),
-      colorIndex: 4,
-    },
-    { title: "Chất lượng GV", data: countBy("teacher_quality"), colorIndex: 5 },
+    { title: "Chuyên cần", data: avgByRiskLevel("chuyen_can"), colorIndex: 1 },
+    { title: "Giờ tự học", data: avgByRiskLevel("thoi_gian_tu_hoc"), colorIndex: 2 },
+    { title: "Điểm quá trình", data: avgByRiskLevel("diem_qua_trinh"), colorIndex: 3 },
+    { title: "Hoàn thành BT (%)", data: avgByRiskLevel("hoan_thanh_bai_tap"), colorIndex: 4 },
+    { title: "Trễ học (buổi)", data: avgByRiskLevel("tre_hoc"), colorIndex: 5 },
+    { title: "Tài liệu ôn tập", data: countBy("tai_lieu_on_tap"), colorIndex: 0 },
+    { title: "Loại môn học", data: countBy("loai_mon_hoc"), colorIndex: 1 },
+    { title: "Hình thức thi", data: countBy("hinh_thuc_thi"), colorIndex: 2 },
+    { title: "Trễ học phí", data: countBy("tre_hoc_phi"), colorIndex: 3 },
+    { title: "Hỗ trợ", data: countBy("ho_tro"), colorIndex: 4 },
+    { title: "Học nhóm", data: countBy("hoc_nhom"), colorIndex: 5 },
+    { title: "Làm thêm", data: countBy("lam_them"), colorIndex: 0 },
+    { title: "Có kinh nghiệm", data: countBy("co_kinh_nghiem"), colorIndex: 1 },
   ];
 
   const sortedPreviousScores = filtered
-    .map((item) => Number(item.previous_scores) || 0)
+    .map((item) => Number(item.diem_qua_trinh) || 0)
     .sort((a, b) => a - b)
     .map((value, index) => ({ name: `#${index + 1}`, value }));
 
@@ -1380,7 +1365,7 @@ export default function QuanLySinhVien() {
                 marginTop: 8,
               }}
             >
-              Đề xuất gửi email can thiệp cho Cố vấn học tập
+              Đề xuất gửi email can thiệp cho Phòng Đào Tạo
             </p>
           </div>
         </>

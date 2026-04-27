@@ -84,8 +84,8 @@ export default function ThongTinCaNhan() {
 
   const initials = data?.HoTen?.split(' ').slice(-2).map(w => w[0]).join('').toUpperCase() || 'SV'
   const riskPct = riskData ? (riskData.risk_score || 0) * 100 : 0
-  const attendancePct = riskData ? (parseFloat(riskData.attendance) || 0) : 0
-  const gpa = riskData ? ((parseFloat(riskData.previous_scores) || 0) / 25).toFixed(1) : '—'
+  const attendancePct = riskData ? (parseFloat(riskData.chuyen_can) || 0) : 0
+  const gpa = riskData ? ((parseFloat(riskData.diem_qua_trinh) || 0) * 0.4).toFixed(1) : '—'
 
   const infoItems = [
     { icon: <MdBadge size={22} />, label: 'MÃ SỐ SINH VIÊN', value: data?.MSSV },

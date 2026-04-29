@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
-import { generateAIQuiz, repredictStudent, getAllResults, getStudent, submitAnswer } from "../../services/api";
+import { generateAIQuiz, repredictStudent, getStudent, submitAnswer, getProgress } from "../../services/api";
 import {
   MdCheckCircle, MdCancel, MdQuiz, MdRefresh,
   MdSend, MdTrendingDown, MdTrendingUp, MdAutoAwesome
@@ -126,21 +126,24 @@ export default function AIBaiTapTest() {
     async function loadStudentData() {
       if (!mssv) return;
       try {
-        const [svRes, riskRes] = await Promise.all([
+        const [svRes, progressRes] = await Promise.all([
           getStudent(mssv),
-          getAllResults(user?.id, 'khoa').catch(() => ({ data: [] }))
+          getProgress(mssv).catch(() => ({ data: { history: [] } }))
         ]);
 
         if (svRes.data?.Nganh) {
           setMonHoc(svRes.data.Nganh);
-        } else {
-          setMonHoc("Đại cương");
         }
 
-        const raw = riskRes.data || [];
-        const mine = raw.filter(r => String(r.MSSV) === String(mssv));
-        if (mine.length > 0) {
-          const latest = mine.reduce((a, b) => new Date(a.created_at) > new Date(b.created_at) ? a : b);
+        const history = progressRes.data?.history || [];
+        if (history.length > 0) {
+          const latest = history[history.length - 1];
+          
+          // Ưu tiên lấy tên môn học thực tế từ bảng môn học
+          if (latest.ten_mon_hoc) {
+            setMonHoc(latest.ten_mon_hoc);
+          }
+
           setRepredForm({
             thoi_gian_tu_hoc: latest.thoi_gian_tu_hoc ?? 0,
             chuyen_can: latest.chuyen_can ?? 0,

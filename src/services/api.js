@@ -14,8 +14,11 @@ export const changePassword = (username, old_password, new_password) =>
 
 // ── Dashboard & Lịch sử ───────────────────────────────
 export const getDashboardStats = () => api.get("/api/v2/data/dashboard-stats");
-export const getAllResults = (batchId) =>
-  api.get("/api/v2/data/all-results", { params: { batch_id: batchId } });
+export const getAllResults = (userId, batchId) => {
+  const params = { batch_id: batchId };
+  if (userId) params.user_id = userId;
+  return api.get("/api/v2/data/all-results", { params });
+};
 export const getBatches = () => api.get("/api/v2/data/batches");
 
 // ── Sinh viên ─────────────────────────────────────────
@@ -54,6 +57,21 @@ export const getLearningPath = (mssv) =>
 export const updatePathStatus = (pathId, status) =>
   api.put(`/api/v2/learning-path/${pathId}/status`, { status });
 
+export const getSavedAIRoadmap = (mssv) =>
+  api.get(`/api/v2/ai-roadmap/${mssv}`);
+
+export const getAllMonHoc = () =>
+  api.get("/api/v2/monhoc");
+
+export const getAIRoadmap = (mssv, nganh, mon, ly_do_rot) => {
+  return api.post("/api/v2/generate-ai-roadmap", {
+    mssv: mssv,
+    nganh: nganh,
+    mon: mon,
+    ly_do_rot: ly_do_rot
+  }, { timeout: 120000 });
+};
+
 // ── Bài tập & Test ────────────────────────────────────
 export const getExercises = (mssv) =>
   api.get(`/api/v2/exercises/${mssv}`);
@@ -66,7 +84,7 @@ export const submitAnswer = (exerciseId, mssv, chosenIndex) =>
   });
 
 export const generateAIQuiz = (mssv, mon_hoc, ly_do) =>
-  api.post("/api/v2/generate-ai-quiz", { mssv, mon_hoc, ly_do });
+  api.post("/api/v2/generate-ai-quiz", { mssv, mon_hoc, ly_do }, { timeout: 120000 });
 
 // ── Khảo sát Tâm lý (New) ─────────────────────────────
 export const getTamLyRandom = (mssv) =>

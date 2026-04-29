@@ -37,53 +37,6 @@ function RiskBar({ percent }) {
   );
 }
 
-function SessionCard({ session, index, isFirst, isLast }) {
-  const pct = session.risk_score_percent;
-  const levelColor = pct >= 65 ? "#ef4444" : pct >= 40 ? "#f59e0b" : "#10b981";
-  const levelBg = pct >= 65 ? "#fef2f2" : pct >= 40 ? "#fffbeb" : "#f0fdf4";
-
-  return (
-    <div style={{
-      background: "#fff", borderRadius: 16, border: `2px solid ${isLast ? "#6366f1" : "#e2e8f0"}`,
-      padding: "20px 24px", boxShadow: isLast ? "0 4px 16px rgba(99,102,241,0.15)" : "0 2px 6px rgba(0,0,0,0.04)",
-      position: "relative"
-    }}>
-      {isLast && (
-        <span style={{
-          position: "absolute", top: -12, right: 16,
-          background: "#6366f1", color: "#fff", fontSize: 11, fontWeight: 800,
-          padding: "4px 12px", borderRadius: 20
-        }}>MỚI NHẤT</span>
-      )}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
-        <div>
-          <div style={{ fontSize: 12, color: "#94a3b8", fontWeight: 600 }}>
-            {session.is_repredict ? "🔄 Dự báo lại" : `📋 Lần ${index + 1}`}
-          </div>
-          <div style={{ fontSize: 13, color: "#64748b", marginTop: 2 }}>
-            {session.created_at ? new Date(session.created_at).toLocaleString("vi-VN") : "N/A"}
-          </div>
-        </div>
-        <div style={{ textAlign: "right" }}>
-          <div style={{ fontSize: 32, fontWeight: 900, color: levelColor }}>{pct}%</div>
-          <span style={{ fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 20, background: levelBg, color: levelColor }}>
-            {session.risk_level}
-          </span>
-        </div>
-      </div>
-      <RiskBar percent={pct} />
-      {session.warning_reasons?.length > 0 && (
-        <div style={{ marginTop: 14, display: "flex", flexWrap: "wrap", gap: 6 }}>
-          {session.warning_reasons.map((r, i) => (
-            <span key={i} style={{ background: "#fef3c7", color: "#92400e", borderRadius: 20, padding: "3px 10px", fontSize: 11, fontWeight: 600, display: "flex", alignItems: "center", gap: 4 }}>
-              <MdWarningAmber size={12} /> {r}
-            </span>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
 
 function CompareTable({ history }) {
   if (history.length < 2) return null;
@@ -294,23 +247,6 @@ export default function TienBoSoSanh() {
         </div>
       </div>
 
-      {/* Session cards */}
-      <div style={{ marginBottom: 28 }}>
-        <h3 style={{ fontSize: 16, fontWeight: 800, color: "#1e293b", marginBottom: 16 }}>
-          📋 Lịch sử {total_sessions} lần dự báo
-        </h3>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 16 }}>
-          {history.map((s, i) => (
-            <SessionCard
-              key={s.result_id}
-              session={s}
-              index={i}
-              isFirst={i === 0}
-              isLast={i === history.length - 1}
-            />
-          ))}
-        </div>
-      </div>
 
       {/* Compare table */}
       {history.length >= 2 && (

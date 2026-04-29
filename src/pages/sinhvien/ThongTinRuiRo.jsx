@@ -121,16 +121,16 @@ export default function ThongTinRuiRo() {
 
   const tiles = [
     { icon: <MdAccessTime />, label: "Giờ tự học/tuần", value: `${data.thoi_gian_tu_hoc ?? 0}h`, highlight: isHL("thoi_gian_tu_hoc", "tự học") },
-    { icon: <MdCalendarToday />, label: "Chuyên cần", value: `${data.chuyen_can ?? 0}%`, highlight: isHL("chuyen_can", "chuyên cần") },
-    { icon: <MdStar />, label: "Điểm quá trình", value: data.diem_qua_trinh ?? 0, highlight: isHL("diem_qua_trinh", "điểm") },
+    { icon: <MdCalendarToday />, label: "Chuyên cần", value: `${data.chuyen_can ?? 0}%`, highlight: isHL("chuyen_can", "chuyên cần", "đi học") },
+    { icon: <MdStar />, label: "Điểm quá trình", value: data.diem_qua_trinh ?? 0, highlight: isHL("diem_qua_trinh", "điểm quá trình") },
     { icon: <MdMenuBook />, label: "Hoàn thành BT", value: `${data.hoan_thanh_bai_tap ?? 0}%`, highlight: isHL("hoan_thanh_bai_tap", "bài tập") },
     { icon: <MdCategory />, label: "Loại môn học", value: data.loai_mon_hoc || "—", highlight: isHL("loai_mon_hoc", "môn học") },
     { icon: <MdBook />, label: "Tài liệu ôn tập", value: data.tai_lieu_on_tap || "—", highlight: isHL("tai_lieu_on_tap", "tài liệu") },
     { icon: <MdOutlineQuiz />, label: "Hình thức thi", value: data.hinh_thuc_thi || "—", highlight: isHL("hinh_thuc_thi", "hình thức thi") },
     { icon: <MdPayments />, label: "Trễ học phí", value: data.tre_hoc_phi || "—", highlight: isHL("tre_hoc_phi", "học phí") },
     { icon: <MdSupportAgent />, label: "Có hỗ trợ", value: data.ho_tro || "—", highlight: isHL("ho_tro", "hỗ trợ") },
-    { icon: <MdAlarm />, label: "Số lần trễ học", value: data.tre_hoc ?? 0, highlight: isHL("tre_hoc", "trễ học") },
-    { icon: <MdGroups />, label: "Học nhóm", value: data.hoc_nhom || "—", highlight: isHL("hoc_nhom", "học nhóm") },
+    { icon: <MdAlarm />, label: "Số lần trễ học", value: data.tre_hoc ?? 0, highlight: isHL("tre_hoc", "trễ học", "đi trễ") },
+    { icon: <MdGroups />, label: "Học nhóm", value: data.hoc_nhom || "—", highlight: isHL("hoc_nhom", "học nhóm", "học tập nhóm") },
     { icon: <MdWork />, label: "Làm thêm", value: data.lam_them || "—", highlight: isHL("lam_them", "làm thêm") },
     { icon: <MdTrendingUp />, label: "Có kinh nghiệm", value: data.co_kinh_nghiem || "—", highlight: isHL("co_kinh_nghiem", "kinh nghiệm") },
   ];

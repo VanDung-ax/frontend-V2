@@ -66,7 +66,7 @@ export default function LoginPage() {
           <div className="login-icon">
             <MdShield size={28} />
           </div>
-          <h1 className="login-title">Hệ Thống dự báo rủi ro</h1>
+          <h1 className="login-title">Hệ thống dự báo rủi ro rớt môn</h1>
           <p className="login-sub">Chào mừng quay trở lại</p>
 
           <form onSubmit={handleSubmit}>
@@ -158,15 +158,6 @@ export default function LoginPage() {
               >
                 <input type="checkbox" /> Ghi nhớ đăng nhập
               </label>
-              <span
-                style={{
-                  color: "var(--accent)",
-                  fontWeight: 600,
-                  cursor: "pointer",
-                }}
-              >
-                Quên mật khẩu?
-              </span>
             </div>
 
             {error && (

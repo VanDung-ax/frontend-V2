@@ -2,7 +2,7 @@ import { Outlet, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import {
   MdPerson, MdWarning, MdLogout, MdShield,
-  MdRoute, MdQuiz, MdTrendingUp, MdLock, MdAutoAwesome
+  MdRoute, MdQuiz, MdTrendingUp, MdLock, MdAutoAwesome, MdFingerprint
 } from "react-icons/md";
 
 function getInitials(name) {
@@ -11,13 +11,13 @@ function getInitials(name) {
 }
 
 const NAV_LINKS = [
-  { to: "/sinhvien/thong-tin", icon: <MdPerson />, label: "Thông tin cá nhân" },
-  { to: "/sinhvien/rui-ro", icon: <MdWarning />, label: "Rủi ro học tập" },
-  { to: "/sinhvien/lo-trinh", icon: <MdRoute />, label: "Lộ trình học tập" },
-  { to: "/sinhvien/bai-tap", icon: <MdQuiz />, label: "Bài tập & Test" },
-  { to: "/sinhvien/bai-tap-ai", icon: <MdAutoAwesome />, label: "Bài tập AI" },
-  { to: "/sinhvien/tien-bo", icon: <MdTrendingUp />, label: "Tiến bộ của tôi" },
-  { to: "/sinhvien/doi-mat-khau", icon: <MdLock />, label: "Đổi mật khẩu" },
+  { to: "/sinhvien/thong-tin", icon: <MdPerson size={18} />, label: "THÔNG TIN CÁ NHÂN" },
+  { to: "/sinhvien/rui-ro", icon: <MdWarning size={18} />, label: "RỦI RO HỌC TẬP" },
+  { to: "/sinhvien/lo-trinh", icon: <MdRoute size={18} />, label: "LỘ TRÌNH HỌC TẬP" },
+  { to: "/sinhvien/bai-tap", icon: <MdQuiz size={18} />, label: "BÀI TẬP & TEST" },
+  { to: "/sinhvien/bai-tap-ai", icon: <MdAutoAwesome size={18} />, label: "BÀI TẬP AI" },
+  { to: "/sinhvien/tien-bo", icon: <MdTrendingUp size={18} />, label: "TIẾN BỘ CỦA TÔI" },
+  { to: "/sinhvien/doi-mat-khau", icon: <MdLock size={18} />, label: "ĐỔI MẬT KHẨU" },
 ];
 
 export default function SinhvienLayout() {
@@ -30,84 +30,86 @@ export default function SinhvienLayout() {
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--content-bg)" }}>
-      <header style={{
-        background: "var(--card-bg)",
-        borderBottom: "1px solid var(--border)",
-        padding: "0 28px",
-        height: 64,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        boxShadow: "var(--shadow-sm)",
-        position: "sticky", top: 0, zIndex: 100
-      }}>
-        {/* Left: Logo + Nav */}
-        <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-          {/* Logo */}
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginRight: 8 }}>
-            <div style={{
-              width: 32, height: 32, background: "linear-gradient(135deg,#6366f1,#8b5cf6)",
-              borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 16
-            }}>
-              <MdShield />
-            </div>
-            <span style={{ fontWeight: 800, fontSize: 13, color: "var(--text-primary)", whiteSpace: "nowrap" }}>
-              Early Warning
-            </span>
-          </div>
-
-          {/* Nav */}
-          <nav style={{ display: "flex", gap: 2, flexWrap: "nowrap" }}>
-            {NAV_LINKS.map(link => (
-              <NavLink
-                key={link.to}
-                to={link.to}
-                style={({ isActive }) => ({
-                  padding: "7px 13px",
-                  borderRadius: 8,
-                  fontSize: 13,
-                  fontWeight: 500,
-                  textDecoration: "none",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 5,
-                  color: isActive ? "#6366f1" : "var(--text-secondary)",
-                  background: isActive ? "#eff6ff" : "none",
-                  transition: "all 0.2s ease",
-                  whiteSpace: "nowrap"
-                })}
-              >
-                {link.icon}
-                {link.label}
-              </NavLink>
-            ))}
-          </nav>
+    <div className="cyber-theme cyber-layout">
+      {/* ── Sidebar ──────────────────────────────────── */}
+      <aside className="cyber-sidebar">
+        <div className="cyber-sidebar-header">
+          <div className="cyber-logo-text">CORE_PORTAL_V1</div>
         </div>
 
-        {/* Right: User + Logout */}
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <div style={{
-            width: 34, height: 34, borderRadius: "50%",
-            background: "linear-gradient(135deg,#6366f1,#8b5cf6)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            color: "#fff", fontWeight: 800, fontSize: 13
+        <div style={{ padding: "24px 20px 10px" }}>
+          <div style={{ 
+            background: "rgba(0, 240, 255, 0.05)", 
+            border: "1px solid var(--cyber-accent)", 
+            borderRadius: 8, 
+            padding: "16px",
+            display: "flex", alignItems: "center", gap: 14
           }}>
-            {getInitials(user?.display_name || user?.username)}
+            <div className="cyber-avatar">
+              <MdFingerprint size={24} />
+            </div>
+            <div>
+              <div style={{ fontSize: 10, color: "var(--cyber-accent)", letterSpacing: 1 }}>ID: STUDENT_ID_{user?.linked_id || "000"}</div>
+              <div style={{ fontSize: 10, color: "var(--cyber-success)", display: "flex", alignItems: "center", gap: 6, marginTop: 4 }}>
+                <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--cyber-success)", boxShadow: "var(--cyber-success-glow)" }}></span>
+                Status: Online
+              </div>
+            </div>
           </div>
-          <div>
-            <div style={{ fontWeight: 600, fontSize: 13 }}>{user?.display_name || user?.username}</div>
-            <div style={{ fontSize: 10, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: 0.5 }}>Sinh viên · {user?.linked_id}</div>
-          </div>
-          <button className="btn btn-outline btn-sm" onClick={handleLogout}>
-            <MdLogout /> Đăng xuất
-          </button>
         </div>
-      </header>
 
-      <main className="page-content">
-        <Outlet />
-      </main>
+        <nav className="cyber-nav">
+          {NAV_LINKS.map(link => (
+            <NavLink
+              key={link.to}
+              to={link.to}
+              className={({ isActive }) => `cyber-nav-item ${isActive ? "active" : ""}`}
+            >
+              {link.icon}
+              {link.label}
+            </NavLink>
+          ))}
+        </nav>
+
+        <div style={{ padding: "20px", borderTop: "1px solid var(--cyber-border)" }}>
+          <div style={{ fontSize: 10, color: "var(--cyber-text-muted)", marginBottom: 8, letterSpacing: 1 }}>SYSTEM LOAD: 24%</div>
+          <div style={{ height: 4, background: "rgba(255,255,255,0.1)", borderRadius: 2, overflow: "hidden" }}>
+            <div style={{ width: "24%", height: "100%", background: "var(--cyber-accent)", boxShadow: "var(--cyber-accent-glow)" }}></div>
+          </div>
+        </div>
+      </aside>
+
+      {/* ── Main Content ─────────────────────────────── */}
+      <div className="cyber-main">
+        <header className="cyber-topbar">
+          <div style={{ display: "flex", gap: 32 }}>
+            {["DASHBOARD", "ANALYTICS", "RESOURCES"].map((item, i) => (
+              <div key={item} style={{ 
+                color: i === 0 ? "var(--cyber-accent)" : "var(--cyber-text-muted)",
+                fontSize: 12, fontWeight: 700, letterSpacing: 2, cursor: "pointer",
+                borderBottom: i === 0 ? "2px solid var(--cyber-accent)" : "none",
+                paddingBottom: 6, paddingTop: 6
+              }}>
+                {item}
+              </div>
+            ))}
+          </div>
+
+          <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+            <button className="cyber-btn" onClick={handleLogout} style={{ padding: "6px 14px", fontSize: 10 }}>
+              <MdLogout size={14} style={{ marginRight: 6, verticalAlign: "middle" }} />
+              LOGOUT
+            </button>
+            <div className="cyber-avatar" style={{ width: 32, height: 32, borderRadius: "50%" }}>
+              {getInitials(user?.display_name || user?.username)}
+            </div>
+          </div>
+        </header>
+
+        <main className="cyber-content">
+          <Outlet />
+        </main>
+      </div>
     </div>
   );
 }

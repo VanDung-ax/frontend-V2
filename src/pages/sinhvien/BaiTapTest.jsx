@@ -12,35 +12,29 @@ const OPTION_LABELS = ["A", "B", "C", "D"];
 const customStyles = `
   .quiz-option {
     transition: all 0.2s ease;
+    background: rgba(0, 240, 255, 0.05);
+    border: 1px solid var(--cyber-border);
+    color: var(--cyber-text);
   }
   .quiz-option:not(:disabled):hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
-    border-color: #93c5fd !important;
+    transform: translateX(4px);
+    box-shadow: inset 0 0 10px rgba(0, 240, 255, 0.1);
+    border-color: var(--cyber-accent);
   }
-  .premium-card {
-    background: #fff;
-    border-radius: 24px;
-    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.025);
-    border: 1px solid #f1f5f9;
-    transition: transform 0.3s ease;
+  .quiz-option.selected {
+    background: rgba(0, 240, 255, 0.1);
+    border-color: var(--cyber-accent);
+    box-shadow: var(--cyber-accent-glow);
   }
-  .start-banner {
-    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-    border: 1px solid #bae6fd;
-    box-shadow: 0 20px 40px -10px rgba(56, 189, 248, 0.15);
+  .quiz-option.correct {
+    background: rgba(0, 255, 157, 0.1) !important;
+    border-color: var(--cyber-success) !important;
+    box-shadow: var(--cyber-success-glow) !important;
   }
-  .premium-input {
-    transition: all 0.2s ease;
-  }
-  .premium-input:focus {
-    border-color: #3b82f6 !important;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
-  }
-  .gradient-text {
-    background: linear-gradient(135deg, #2563eb, #7c3aed);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+  .quiz-option.wrong {
+    background: rgba(255, 0, 85, 0.1) !important;
+    border-color: var(--cyber-danger) !important;
+    box-shadow: inset 0 0 10px rgba(255, 0, 85, 0.2) !important;
   }
 `;
 
@@ -49,71 +43,68 @@ function QuizCard({ question, index, selectedIdx, onSelect, result }) {
   const correctIdx = done ? result.correct_index : null;
 
   return (
-    <div className="premium-card" style={{
-      overflow: "hidden", marginBottom: 20
-    }}>
-      <div style={{ padding: "20px 24px", borderBottom: "1px solid #f1f5f9", background: "rgba(248, 250, 252, 0.5)" }}>
-        <div style={{ fontSize: 13, fontWeight: 700, color: "#6366f1", marginBottom: 6, textTransform: "uppercase" }}>
-          Câu {index + 1} • {question.thuoc_tinh}
+    <div className="cyber-card" style={{ padding: 0, marginBottom: 20, overflow: "hidden" }}>
+      <div style={{ padding: "20px 24px", borderBottom: "1px solid var(--cyber-border)", background: "rgba(0, 240, 255, 0.02)" }}>
+        <div style={{ fontSize: 11, fontFamily: 'var(--font-mono)', color: "var(--cyber-accent)", marginBottom: 6, textTransform: "uppercase", letterSpacing: 1 }}>
+          SEQ_{index + 1} // {question.thuoc_tinh}
         </div>
-        <p style={{ margin: 0, fontWeight: 700, fontSize: 15, color: "#1e293b", lineHeight: 1.5 }}>
+        <p style={{ margin: 0, fontFamily: 'var(--font-display)', fontSize: 16, color: "var(--cyber-text)", lineHeight: 1.5 }}>
           {question.question}
         </p>
       </div>
 
       <div style={{ padding: "16px 20px", display: "flex", flexDirection: "column", gap: 10 }}>
         {(question.options || []).map((opt, idx) => {
-          let bg = "#f8fafc", border = "#e2e8f0", color = "#374151";
+          let extraClass = "";
+          let iconColor = "var(--cyber-text-muted)";
           
           if (done) {
-            if (idx === correctIdx) { bg = "#ecfdf5"; border = "#6ee7b7"; color = "#065f46"; }
-            else if (idx === selectedIdx && !result.is_correct) { bg = "#fef2f2"; border = "#fca5a5"; color = "#991b1b"; }
-          } else if (selectedIdx === idx) { bg = "#eff6ff"; border = "#93c5fd"; color = "#1d4ed8"; }
+            if (idx === correctIdx) { extraClass = "correct"; iconColor = "var(--cyber-success)"; }
+            else if (idx === selectedIdx && !result.is_correct) { extraClass = "wrong"; iconColor = "var(--cyber-danger)"; }
+          } else if (selectedIdx === idx) { extraClass = "selected"; iconColor = "var(--cyber-accent)"; }
 
           return (
             <button
               key={idx}
-              className="quiz-option"
+              className={`quiz-option ${extraClass}`}
               disabled={done}
               onClick={() => onSelect(question.id, idx)}
               style={{
-                width: "100%", textAlign: "left", background: bg,
-                border: `1.5px solid ${border}`, borderRadius: 10,
-                padding: "10px 14px", cursor: done ? "default" : "pointer",
-                display: "flex", alignItems: "center", gap: 10, color
+                width: "100%", textAlign: "left",
+                borderRadius: 4, padding: "12px 16px", cursor: done ? "default" : "pointer",
+                display: "flex", alignItems: "center", gap: 12
               }}
             >
               <span style={{
-                width: 28, height: 28, borderRadius: "50%",
-                background: (done && idx === correctIdx) ? "#10b981" :
-                  (done && idx === selectedIdx && !result.is_correct) ? "#ef4444" :
-                  (selectedIdx === idx) ? "#3b82f6" : "#e2e8f0",
-                color: (done && (idx === correctIdx || (idx === selectedIdx && !result.is_correct))) || selectedIdx === idx ? "#fff" : "#64748b",
+                width: 24, height: 24,
+                border: `1px solid ${iconColor}`,
+                color: iconColor,
                 display: "flex", alignItems: "center", justifyContent: "center",
-                fontWeight: 800, fontSize: 13, flexShrink: 0
+                fontFamily: 'var(--font-mono)', fontSize: 12, flexShrink: 0,
+                boxShadow: extraClass ? `0 0 8px ${iconColor}` : 'none'
               }}>
                 {OPTION_LABELS[idx]}
               </span>
-              <span style={{ fontSize: 14, fontWeight: 500, flex: 1 }}>{opt}</span>
+              <span style={{ fontSize: 14, fontFamily: 'var(--font-mono)', flex: 1 }}>{opt}</span>
             </button>
           );
         })}
 
         {done && (
           <div style={{
-            marginTop: 8, padding: "14px 16px", borderRadius: 12,
-            background: result.is_correct ? "#f0fdf4" : "#fff7ed",
-            border: `1px solid ${result.is_correct ? "#86efac" : "#fed7aa"}`,
+            marginTop: 8, padding: "14px 16px", borderRadius: 4,
+            background: result.is_correct ? "rgba(0, 255, 157, 0.05)" : "rgba(255, 183, 3, 0.05)",
+            border: `1px solid ${result.is_correct ? "var(--cyber-success)" : "var(--cyber-warning)"}`,
             display: "flex", gap: 10, alignItems: "flex-start"
           }}>
             {result.is_correct
-              ? <MdCheckCircle size={20} color="#10b981" style={{ flexShrink: 0, marginTop: 1 }} />
-              : <MdTrendingDown size={20} color="#f97316" style={{ flexShrink: 0, marginTop: 1 }} />}
+              ? <MdCheckCircle size={20} color="var(--cyber-success)" style={{ flexShrink: 0, marginTop: 1 }} />
+              : <MdTrendingDown size={20} color="var(--cyber-warning)" style={{ flexShrink: 0, marginTop: 1 }} />}
             <div>
-              <div style={{ fontWeight: 700, fontSize: 13, color: result.is_correct ? "#166534" : "#c2410c", marginBottom: 4 }}>
-                {result.is_correct ? "Chính xác! 🎉" : "Chưa đúng — Giải thích:"}
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: 13, color: result.is_correct ? "var(--cyber-success)" : "var(--cyber-warning)", marginBottom: 4 }}>
+                {result.is_correct ? "MATCH_FOUND_CORRECT" : "ANOMALY_DETECTED // EXPLANATION:"}
               </div>
-              <div style={{ fontSize: 13, color: "#475569", lineHeight: 1.6 }}>
+              <div style={{ fontSize: 13, color: "var(--cyber-text-muted)", lineHeight: 1.6, fontFamily: 'var(--font-mono)' }}>
                 {result.explanation}
               </div>
             </div>
@@ -202,7 +193,7 @@ export default function BaiTapTest() {
 
   const handleSubmit = async () => {
     if (Object.keys(answers).length < questions.length) {
-      if (!window.confirm("Bạn chưa hoàn thành tất cả câu hỏi. Vẫn muốn nộp bài?")) return;
+      if (!window.confirm("WARNING: INCOMPLETE DATASET. PROCEED ANYWAY?")) return;
     }
     
     setSubmitting(true);
@@ -211,7 +202,7 @@ export default function BaiTapTest() {
       setResults(res.data);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (e) {
-      alert("Lỗi khi nộp bài: " + (e.response?.data?.detail || e.message));
+      alert("ERR: " + (e.response?.data?.detail || e.message));
     } finally {
       setSubmitting(false);
     }
@@ -226,7 +217,7 @@ export default function BaiTapTest() {
       });
       setRepredResult(res.data);
     } catch (e) {
-      alert("Lỗi dự báo lại: " + (e.response?.data?.detail || e.message));
+      alert("ERR: " + (e.response?.data?.detail || e.message));
     } finally {
       setRepredicting(false);
     }
@@ -234,32 +225,31 @@ export default function BaiTapTest() {
 
   if (loading) return (
     <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: 300 }}>
-      <div className="spinner" />
+      <div className="spinner" style={{ borderColor: 'var(--cyber-accent)', borderTopColor: 'transparent' }} />
     </div>
   );
 
   if (!hasStarted) return (
     <div style={{ maxWidth: 720, margin: "0 auto", padding: "20px 0" }}>
       <style>{customStyles}</style>
-      <div className="page-header" style={{ marginBottom: 32, textAlign: "center" }}>
-        <h1 className="gradient-text" style={{ fontSize: 32, fontWeight: 900, marginBottom: 8 }}>Khảo sát Tâm lý & Thói quen</h1>
-        <p style={{ color: "#64748b", fontSize: 16 }}>
-          Bài khảo sát giúp nhận diện và cải thiện kỹ năng quản lý thời gian, phương pháp học tập.
+      <div style={{ marginBottom: 32, textAlign: "center" }}>
+        <h1 style={{ fontSize: 28, fontFamily: 'var(--font-display)', color: "var(--cyber-accent)", textShadow: "var(--cyber-accent-glow)", marginBottom: 8 }}>PSYCH_EVALUATION_PROTOCOL</h1>
+        <p style={{ color: "var(--cyber-text-muted)", fontSize: 14, fontFamily: 'var(--font-mono)' }}>
+          System to analyze and calibrate time management and psychological stability parameters.
         </p>
       </div>
-      <div className="premium-card start-banner" style={{ borderRadius: 28, padding: "56px 32px", textAlign: "center" }}>
-        <div style={{ fontSize: 72, marginBottom: 20, filter: "drop-shadow(0 10px 15px rgba(0,0,0,0.1))" }}>🧠</div>
-        <h2 className="gradient-text" style={{ fontSize: 32, fontWeight: 900, marginBottom: 16 }}>Kiểm tra Tâm lý Học tập</h2>
-        <p style={{ color: "#475569", marginBottom: 36, fontSize: 16, lineHeight: 1.6, maxWidth: 480, margin: "0 auto 36px" }}>
-          Hệ thống sẽ lấy ngẫu nhiên 30 câu hỏi từ ngân hàng câu hỏi để kiểm tra phương pháp học và trạng thái tâm lý của bạn.
+      <div className="cyber-card" style={{ padding: "56px 32px", textAlign: "center", border: "1px solid var(--cyber-accent)", boxShadow: "inset 0 0 50px rgba(0, 240, 255, 0.05)" }}>
+        <div style={{ fontSize: 64, marginBottom: 20, textShadow: "var(--cyber-accent-glow)" }}>🧠</div>
+        <h2 style={{ fontSize: 24, fontFamily: 'var(--font-display)', color: "var(--cyber-text)", marginBottom: 16 }}>INITIATE_DIAGNOSTICS</h2>
+        <p style={{ color: "var(--cyber-text-muted)", marginBottom: 36, fontSize: 14, lineHeight: 1.6, maxWidth: 480, margin: "0 auto 36px", fontFamily: 'var(--font-mono)' }}>
+          The core will retrieve 30 random scenarios from the data banks to evaluate your study vectors and mental state.
         </p>
         <button 
           onClick={startTest}
-          style={{ background: "linear-gradient(135deg, #2563eb, #4f46e5)", color: "#fff", border: "none", borderRadius: 14, padding: "18px 48px", fontSize: 17, fontWeight: 800, cursor: "pointer", boxShadow: "0 10px 25px rgba(37, 99, 235, 0.4)", transition: "transform 0.2s" }}
-          onMouseOver={e => e.currentTarget.style.transform = "scale(1.05)"}
-          onMouseOut={e => e.currentTarget.style.transform = "scale(1)"}
+          className="cyber-btn cyber-btn-primary"
+          style={{ padding: "18px 48px", fontSize: 16 }}
         >
-          Tôi muốn làm bài ngay
+          EXECUTE_PROTOCOL
         </button>
       </div>
     </div>
@@ -268,72 +258,75 @@ export default function BaiTapTest() {
   if (questions.length === 0) return (
     <div style={{ maxWidth: 720, margin: "0 auto", padding: "20px 0" }}>
       <style>{customStyles}</style>
-      <div className="page-header" style={{ textAlign: "center", marginBottom: 32 }}>
-        <h1 className="gradient-text" style={{ fontSize: 32, fontWeight: 900, marginBottom: 8 }}>Khảo sát Tâm lý & Thói quen</h1>
+      <div style={{ textAlign: "center", marginBottom: 32 }}>
+        <h1 style={{ fontSize: 28, fontFamily: 'var(--font-display)', color: "var(--cyber-accent)", textShadow: "var(--cyber-accent-glow)" }}>PSYCH_EVALUATION_PROTOCOL</h1>
       </div>
-      <div className="premium-card" style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", padding: "48px 24px", textAlign: "center" }}>
-        <div style={{ fontSize: 64, marginBottom: 16 }}>🎉</div>
-        <h2 style={{ color: "#166534", fontWeight: 800, fontSize: 24, marginBottom: 8 }}>Không có khảo sát nào!</h2>
-        <p style={{ color: "#15803d", fontSize: 16 }}>Bạn đã làm hết ngân hàng câu hỏi hoặc tâm lý bạn đang rất tốt.</p>
+      <div className="cyber-card" style={{ border: "1px solid var(--cyber-success)", background: "rgba(0, 255, 157, 0.05)", padding: "48px 24px", textAlign: "center" }}>
+        <div style={{ fontSize: 64, marginBottom: 16 }}>✓</div>
+        <h2 style={{ color: "var(--cyber-success)", fontFamily: 'var(--font-display)', fontSize: 20, marginBottom: 8 }}>NO_EVALUATIONS_REQUIRED</h2>
+        <p style={{ color: "var(--cyber-text-muted)", fontSize: 14, fontFamily: 'var(--font-mono)' }}>Database empty or psychological parameters are already optimal.</p>
       </div>
     </div>
   );
 
   const NUMERIC_FIELDS = [
-    { key: "thoi_gian_tu_hoc", label: "Giờ tự học/tuần", min: 0, max: 40 },
-    { key: "chuyen_can", label: "Chuyên cần (%)", min: 0, max: 100 },
-    { key: "diem_qua_trinh", label: "Điểm quá trình (0-10)", min: 0, max: 10 },
-    { key: "hoan_thanh_bai_tap", label: "Hoàn thành bài tập (%)", min: 0, max: 100 },
-    { key: "tre_hoc", label: "Số lần trễ học", min: 0, max: 30 }
+    { key: "thoi_gian_tu_hoc", label: "STUDY_HOURS", min: 0, max: 40 },
+    { key: "chuyen_can", label: "ATTENDANCE_PCT", min: 0, max: 100 },
+    { key: "diem_qua_trinh", label: "MIDTERM_SCORE", min: 0, max: 10 },
+    { key: "hoan_thanh_bai_tap", label: "TASK_COMPLETION", min: 0, max: 100 },
+    { key: "tre_hoc", label: "LATE_COUNT", min: 0, max: 30 }
   ];
   const YESNO_FIELDS = [
-    { key: "loai_mon_hoc", label: "Loại môn học", options: ["Đại cương", "Chuyên ngành", "Thực hành", "Tự chọn"] },
-    { key: "tai_lieu_on_tap", label: "Có tài liệu ôn tập", options: ["Có", "Không"] },
-    { key: "hinh_thuc_thi", label: "Hình thức thi", options: ["Tự luận", "Trắc nghiệm", "Thực hành", "Vấn đáp"] },
-    { key: "tre_hoc_phi", label: "Trễ học phí", options: ["Có", "Không"] },
-    { key: "ho_tro", label: "Có hỗ trợ học tập", options: ["Có", "Không"] },
-    { key: "hoc_nhom", label: "Học nhóm", options: ["Có", "Không"] },
-    { key: "lam_them", label: "Làm thêm ngoài giờ", options: ["Có", "Không"] },
-    { key: "co_kinh_nghiem", label: "Có kinh nghiệm thực tế", options: ["Có", "Không"] }
+    { key: "loai_mon_hoc", label: "SUBJECT_TYPE", options: ["Đại cương", "Chuyên ngành", "Thực hành", "Tự chọn"] },
+    { key: "tai_lieu_on_tap", label: "MATERIAL_ACCESS", options: ["Có", "Không"] },
+    { key: "hinh_thuc_thi", label: "EXAM_FORMAT", options: ["Tự luận", "Trắc nghiệm", "Thực hành", "Vấn đáp"] },
+    { key: "tre_hoc_phi", label: "TUITION_DELAY", options: ["Có", "Không"] },
+    { key: "ho_tro", label: "FINANCIAL_AID", options: ["Có", "Không"] },
+    { key: "hoc_nhom", label: "GROUP_STUDY", options: ["Có", "Không"] },
+    { key: "lam_them", label: "PART_TIME_JOB", options: ["Có", "Không"] },
+    { key: "co_kinh_nghiem", label: "PRIOR_EXPERIENCE", options: ["Có", "Không"] }
   ];
 
   return (
     <div style={{ maxWidth: 760, margin: "0 auto", paddingBottom: 64, paddingTop: 16 }}>
       <style>{customStyles}</style>
-      <div className="page-header" style={{ marginBottom: 36, textAlign: "center" }}>
-        <h1 className="gradient-text" style={{ fontSize: 32, fontWeight: 900, marginBottom: 12 }}>Khảo sát Tâm lý & Thói quen</h1>
-        <p style={{ color: "#64748b", fontSize: 16, maxWidth: 500, margin: "0 auto" }}>
-          Hoàn thành bảng khảo sát này để nhận diện và cải thiện kỹ năng quản lý thời gian, tâm lý học tập.
+      <div style={{ marginBottom: 36, textAlign: "center" }}>
+        <h1 style={{ fontSize: 28, fontFamily: 'var(--font-display)', color: "var(--cyber-accent)", textShadow: "var(--cyber-accent-glow)", marginBottom: 12 }}>PSYCH_EVALUATION_PROTOCOL</h1>
+        <p style={{ color: "var(--cyber-text-muted)", fontSize: 13, fontFamily: 'var(--font-mono)', maxWidth: 500, margin: "0 auto" }}>
+          Analyze and calibrate psychological parameters.
         </p>
       </div>
 
       {results && (
-        <div style={{
-          background: results.score_percent >= 80 ? "linear-gradient(135deg, #10b981, #059669)" : "linear-gradient(135deg, #f59e0b, #d97706)",
-          borderRadius: 20, padding: "32px", marginBottom: 24,
-          color: "#fff", textAlign: "center", boxShadow: "0 8px 24px rgba(0,0,0,0.15)"
+        <div className="cyber-card" style={{
+          background: results.score_percent >= 80 ? "rgba(0, 255, 157, 0.05)" : "rgba(255, 183, 3, 0.05)",
+          border: `1px solid ${results.score_percent >= 80 ? "var(--cyber-success)" : "var(--cyber-warning)"}`,
+          padding: "32px", marginBottom: 24, textAlign: "center",
+          boxShadow: results.score_percent >= 80 ? "inset 0 0 30px rgba(0, 255, 157, 0.1)" : "inset 0 0 30px rgba(255, 183, 3, 0.1)"
         }}>
-          <div style={{ fontSize: 48, fontWeight: 900, marginBottom: 8 }}>{results.score_percent}%</div>
-          <div style={{ fontSize: 18, fontWeight: 600 }}>
-            {results.score_percent >= 80 ? "🎉 Tuyệt vời! Tâm lý và thói quen học tập của bạn rất vững." : "Hãy xem kỹ các giải thích bên dưới để cải thiện phương pháp học nhé."}
+          <div style={{ fontSize: 48, fontFamily: 'var(--font-display)', color: results.score_percent >= 80 ? "var(--cyber-success)" : "var(--cyber-warning)", marginBottom: 8, textShadow: results.score_percent >= 80 ? "var(--cyber-success-glow)" : "none" }}>{results.score_percent}%</div>
+          <div style={{ fontSize: 16, fontFamily: 'var(--font-mono)', color: "var(--cyber-text)" }}>
+            {results.score_percent >= 80 ? "STATUS: OPTIMAL // Mental parameters are stable." : "STATUS: SUB_OPTIMAL // Review logs to recalibrate."}
           </div>
           {results.score_percent >= 80 && (
-            <div style={{ marginTop: 24, padding: "20px", background: "rgba(255,255,255,0.15)", borderRadius: 12 }}>
-              <p style={{ margin: "0 0 16px", fontSize: 15, fontWeight: 600 }}>
-                💡 Vì tâm lý của bạn rất ổn định, hệ thống cho rằng bạn chỉ đang bị "hổng" kiến thức môn học. Hãy chuyển sang phần Luyện tập AI để lấp lỗ hổng chuyên môn, đồng thời dự báo lại để Phòng Đào Tạo cập nhật hồ sơ!
+            <div style={{ marginTop: 24, padding: "20px", background: "rgba(0,0,0,0.3)", borderRadius: 4, borderLeft: "3px solid var(--cyber-accent)" }}>
+              <p style={{ margin: "0 0 16px", fontSize: 13, fontFamily: 'var(--font-mono)', color: "var(--cyber-text-muted)" }}>
+                LOG: Stability detected. Hypothesis: Risk stems from data voids, not mental anomalies. Recommend shifting to AI_TRAINING module to patch knowledge gaps, then run REPREDICT.
               </p>
               <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
                 <button 
                   onClick={() => setShowRepredict(!showRepredict)}
-                  style={{ background: "#fff", color: "#065f46", border: "none", padding: "10px 20px", borderRadius: 8, cursor: "pointer", fontWeight: 700 }}
+                  className="cyber-btn"
+                  style={{ borderColor: "var(--cyber-success)", color: "var(--cyber-success)" }}
                 >
-                  {showRepredict ? "Ẩn form dự báo" : "Dự báo lại (Hạ rủi ro)"}
+                  {showRepredict ? "HIDE_MODULE" : "INITIALIZE_REPREDICT"}
                 </button>
                 <button 
                   onClick={() => navigate("/sinhvien/bai-tap-ai")}
-                  style={{ background: "#3b82f6", color: "#fff", border: "none", padding: "10px 20px", borderRadius: 8, cursor: "pointer", fontWeight: 700, display: "flex", alignItems: "center", gap: 6 }}
+                  className="cyber-btn cyber-btn-primary"
+                  style={{ display: "flex", alignItems: "center", gap: 6 }}
                 >
-                  <MdAutoAwesome /> Luyện bài tập AI
+                  <MdAutoAwesome /> AI_TRAINING_MODULE
                 </button>
               </div>
             </div>
@@ -342,22 +335,21 @@ export default function BaiTapTest() {
       )}
 
       {showRepredict && results?.score_percent >= 80 && (
-        <div className="premium-card" style={{ marginBottom: 36, border: "2px solid #10b981", padding: 36, boxShadow: "0 10px 30px rgba(16, 185, 129, 0.15)" }}>
-          <h3 style={{ margin: "0 0 20px", fontSize: 20, fontWeight: 800, color: "#065f46", display: "flex", alignItems: "center", gap: 10 }}>
-            <MdTrendingUp size={28} /> 📝 Cập nhật thông số để gửi Phòng Đào Tạo
+        <div className="cyber-card" style={{ marginBottom: 36, border: "1px solid var(--cyber-success)", padding: 36, boxShadow: "inset 0 0 20px rgba(0, 255, 157, 0.1)" }}>
+          <h3 style={{ margin: "0 0 20px", fontSize: 18, fontFamily: 'var(--font-display)', color: "var(--cyber-success)", display: "flex", alignItems: "center", gap: 10 }}>
+            <MdTrendingUp size={24} /> METRICS_OVERRIDE_MODULE
           </h3>
-          <p style={{ color: "#475569", marginBottom: 24 }}>Bạn có tâm lý tốt, hãy điền lại thông số để Phòng Đào Tạo nắm bắt tình hình và hạ rủi ro của bạn.</p>
+          <p style={{ color: "var(--cyber-text-muted)", fontFamily: 'var(--font-mono)', fontSize: 12, marginBottom: 24 }}>System stability verified. Submit updated parameters to Core Database to reduce active risk vectors.</p>
           
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
             {NUMERIC_FIELDS.map(f => (
               <div key={f.key}>
-                <label style={{ fontSize: 14, fontWeight: 700, color: "#334155", display: "block", marginBottom: 8 }}>{f.label}</label>
+                <label className="tech-label" style={{ display: "block", marginBottom: 8 }}>{f.label}</label>
                 <input
                   type="number" min={f.min} max={f.max} step={f.key === "diem_qua_trinh" ? 0.1 : 1}
                   value={repredForm[f.key]}
                   onChange={e => setRepredForm(p => ({ ...p, [f.key]: parseFloat(e.target.value) || 0 }))}
-                  className="premium-input"
-                  style={{ width: "100%", padding: "12px 16px", borderRadius: 12, border: "2px solid #e2e8f0", fontSize: 15, outline: "none", background: "#f8fafc" }}
+                  className="cyber-input"
                 />
               </div>
             ))}
@@ -365,12 +357,11 @@ export default function BaiTapTest() {
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 24 }}>
             {YESNO_FIELDS.map(f => (
               <div key={f.key}>
-                <label style={{ fontSize: 14, fontWeight: 700, color: "#334155", display: "block", marginBottom: 8 }}>{f.label}</label>
+                <label className="tech-label" style={{ display: "block", marginBottom: 8 }}>{f.label}</label>
                 <select
                   value={repredForm[f.key]}
                   onChange={e => setRepredForm(p => ({ ...p, [f.key]: e.target.value }))}
-                  className="premium-input"
-                  style={{ width: "100%", padding: "12px 16px", borderRadius: 12, border: "2px solid #e2e8f0", fontSize: 15, outline: "none", background: "#f8fafc" }}
+                  className="cyber-input"
                 >
                   {f.options.map(o => <option key={o} value={o}>{o}</option>)}
                 </select>
@@ -380,33 +371,34 @@ export default function BaiTapTest() {
           <button
             onClick={handleRepredict}
             disabled={repredicting}
-            style={{ background: "#10b981", color: "#fff", border: "none", borderRadius: 12, padding: "14px 32px", fontWeight: 800, fontSize: 15, cursor: repredicting ? "not-allowed" : "pointer", display: "flex", alignItems: "center", gap: 10 }}
+            className="cyber-btn"
+            style={{ background: "rgba(0, 255, 157, 0.1)", borderColor: "var(--cyber-success)", color: "var(--cyber-success)", padding: "14px 32px", display: "flex", alignItems: "center", gap: 10 }}
           >
-            {repredicting ? <div className="spinner" style={{ width: 18, height: 18 }} /> : <MdSend />} Gửi cập nhật
+            {repredicting ? <div className="spinner" style={{ width: 18, height: 18, borderColor: 'var(--cyber-success)', borderTopColor: 'transparent' }} /> : <MdSend />} TRANSMIT_DATA
           </button>
 
           {repredResult && (
-            <div style={{ marginTop: 24, padding: 24, background: "#f0fdf4", borderRadius: 16, border: "1px solid #86efac" }}>
-              <h4 style={{ margin: "0 0 16px", fontWeight: 800, color: "#166534" }}>📊 Kết quả dự báo mới</h4>
+            <div style={{ marginTop: 24, padding: 24, background: "rgba(0, 0, 0, 0.3)", borderRadius: 4, borderLeft: "3px solid var(--cyber-accent)" }}>
+              <h4 style={{ margin: "0 0 16px", fontFamily: 'var(--font-display)', color: "var(--cyber-text)" }}>📊 NEW_PROJECTION_RESULT</h4>
               <div style={{ display: "flex", gap: 24, alignItems: "center" }}>
-                <div style={{ textAlign: "center", background: "#fff", borderRadius: 12, padding: "16px 32px", boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
-                  <div style={{ fontSize: 36, fontWeight: 900, color: repredResult.risk_score >= 0.65 ? "#ef4444" : repredResult.risk_score >= 0.4 ? "#f59e0b" : "#10b981" }}>
+                <div style={{ textAlign: "center", background: "rgba(255,255,255,0.05)", borderRadius: 4, padding: "16px 32px", border: "1px solid var(--cyber-border)" }}>
+                  <div style={{ fontSize: 32, fontFamily: 'var(--font-display)', color: repredResult.risk_score >= 0.65 ? "var(--cyber-danger)" : repredResult.risk_score >= 0.4 ? "var(--cyber-warning)" : "var(--cyber-success)" }}>
                     {repredResult.risk_score_percent}%
                   </div>
-                  <div style={{ fontSize: 13, color: "#64748b" }}>Rủi ro mới</div>
+                  <div className="tech-label">NEW_RISK_VECTOR</div>
                 </div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 700, fontSize: 15, color: "#1e293b", marginBottom: 6 }}>
-                    Mức độ: <span style={{ color: repredResult.risk_level === "CAO" ? "#ef4444" : "#f59e0b" }}>{repredResult.risk_level}</span>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 13, color: "var(--cyber-text)", marginBottom: 6 }}>
+                    LEVEL: <span style={{ color: repredResult.risk_level === "CAO" ? "var(--cyber-danger)" : "var(--cyber-warning)" }}>{repredResult.risk_level}</span>
                   </div>
                   {repredResult.warning_reasons?.length > 0 ? (
                     <div>
                       {repredResult.warning_reasons.map((r, i) => (
-                        <span key={i} style={{ display: "inline-block", background: "#fef3c7", color: "#92400e", borderRadius: 20, padding: "3px 10px", fontSize: 12, fontWeight: 600, marginRight: 6, marginBottom: 4 }}>{r}</span>
+                        <span key={i} className="cyber-badge cyber-badge-warning" style={{ marginRight: 6, marginBottom: 4 }}>{r}</span>
                       ))}
                     </div>
                   ) : (
-                    <div style={{ color: "#10b981", fontWeight: 700 }}>🎉 Bạn đã hoàn toàn an toàn!</div>
+                    <div style={{ color: "var(--cyber-success)", fontFamily: 'var(--font-mono)', fontSize: 12 }}>SYSTEM: ALL_CLEAR</div>
                   )}
                 </div>
               </div>
@@ -429,22 +421,17 @@ export default function BaiTapTest() {
       </div>
 
       {!results && questions.length > 0 && (
-        <div className="premium-card" style={{ marginTop: 32, padding: 32, textAlign: "center", background: "#f8fafc" }}>
-          <h3 style={{ margin: "0 0 16px", fontSize: 20, fontWeight: 800, color: "#1e293b" }}>Đã hoàn thành các câu hỏi?</h3>
-          <p style={{ color: "#64748b", marginBottom: 24, fontSize: 15 }}>Hãy nộp bài để hệ thống phân tích và chấm điểm độ vững tâm lý của bạn.</p>
+        <div className="cyber-card" style={{ marginTop: 32, padding: 32, textAlign: "center" }}>
+          <h3 style={{ margin: "0 0 16px", fontSize: 18, fontFamily: 'var(--font-display)', color: "var(--cyber-text)" }}>ALL_SCENARIOS_EVALUATED?</h3>
+          <p style={{ color: "var(--cyber-text-muted)", marginBottom: 24, fontSize: 13, fontFamily: 'var(--font-mono)' }}>Submit parameters for core analysis.</p>
           <button 
             onClick={handleSubmit}
             disabled={submitting}
-            style={{
-              background: "linear-gradient(135deg, #3b82f6, #2563eb)",
-              color: "#fff", border: "none", borderRadius: 14, padding: "18px 48px",
-              fontSize: 17, fontWeight: 800, cursor: submitting ? "not-allowed" : "pointer", boxShadow: "0 10px 25px rgba(37, 99, 235, 0.3)", transition: "transform 0.2s", display: "inline-flex", alignItems: "center", gap: 10
-            }}
-            onMouseOver={e => !submitting && (e.currentTarget.style.transform = "scale(1.05)")}
-            onMouseOut={e => !submitting && (e.currentTarget.style.transform = "scale(1)")}
+            className="cyber-btn cyber-btn-primary"
+            style={{ padding: "16px 48px", display: "inline-flex", alignItems: "center", gap: 10 }}
           >
-            {submitting ? <div className="spinner" style={{ width: 20, height: 20 }}/> : <MdCheckCircle size={24} />}
-            Nộp bài khảo sát
+            {submitting ? <div className="spinner" style={{ width: 20, height: 20, borderColor: 'var(--cyber-bg)', borderTopColor: 'transparent' }}/> : <MdCheckCircle size={20} />}
+            SUBMIT_EVALUATION
           </button>
         </div>
       )}

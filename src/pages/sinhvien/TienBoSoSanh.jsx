@@ -6,37 +6,22 @@ import {
 } from "react-icons/md";
 
 const FEATURE_LABELS = {
-  thoi_gian_tu_hoc: "Giờ tự học/tuần",
-  chuyen_can: "Chuyên cần (%)",
-  diem_qua_trinh: "Điểm quá trình",
-  hoan_thanh_bai_tap: "Hoàn thành BT (%)",
-  tre_hoc: "Số lần trễ học",
-  loai_mon_hoc: "Loại môn học",
-  tai_lieu_on_tap: "Tài liệu ôn tập",
-  hinh_thuc_thi: "Hình thức thi",
-  tre_hoc_phi: "Trễ học phí",
-  ho_tro: "Có hỗ trợ",
-  hoc_nhom: "Học nhóm",
-  lam_them: "Làm thêm",
-  co_kinh_nghiem: "Có kinh nghiệm"
+  thoi_gian_tu_hoc: "STUDY_HOURS",
+  chuyen_can: "ATTENDANCE_PCT",
+  diem_qua_trinh: "MIDTERM_SCORE",
+  hoan_thanh_bai_tap: "TASK_COMPLETION",
+  tre_hoc: "LATE_COUNT",
+  loai_mon_hoc: "SUBJECT_TYPE",
+  tai_lieu_on_tap: "MATERIAL_ACCESS",
+  hinh_thuc_thi: "EXAM_FORMAT",
+  tre_hoc_phi: "TUITION_DELAY",
+  ho_tro: "FINANCIAL_AID",
+  hoc_nhom: "GROUP_STUDY",
+  lam_them: "PART_TIME_JOB",
+  co_kinh_nghiem: "PRIOR_EXPERIENCE"
 };
 
-// Thuộc tính "tốt hơn = thấp hơn" (rủi ro tỉ lệ thuận)
 const LOWER_IS_BETTER = ["tre_hoc"];
-
-function RiskBar({ percent }) {
-  const color = percent >= 65 ? "#ef4444" : percent >= 40 ? "#f59e0b" : "#10b981";
-  return (
-    <div style={{ position: "relative", height: 10, background: "#e2e8f0", borderRadius: 99, overflow: "hidden", minWidth: 120 }}>
-      <div style={{
-        width: `${Math.min(percent, 100)}%`, height: "100%",
-        background: color, borderRadius: 99,
-        transition: "width 1.2s cubic-bezier(0.34,1.56,0.64,1)"
-      }} />
-    </div>
-  );
-}
-
 
 function CompareTable({ history }) {
   if (history.length < 2) return null;
@@ -58,51 +43,51 @@ function CompareTable({ history }) {
   });
 
   return (
-    <div style={{ background: "#fff", borderRadius: 20, border: "1px solid #e2e8f0", overflow: "hidden", boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}>
-      <div style={{ padding: "16px 24px", borderBottom: "1px solid #f1f5f9", display: "flex", justifyContent: "space-between" }}>
+    <div className="cyber-card" style={{ padding: 0 }}>
+      <div style={{ padding: "16px 24px", borderBottom: "1px solid var(--cyber-border)", display: "flex", justifyContent: "space-between" }}>
         <div>
-          <h3 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: "#1e293b" }}>So sánh thông số</h3>
-          <p style={{ margin: "4px 0 0", fontSize: 13, color: "#64748b" }}>Lần đầu vs Lần mới nhất</p>
+          <h3 style={{ margin: 0, fontSize: 16, fontFamily: 'var(--font-display)', color: "var(--cyber-accent)" }}>METRICS_COMPARISON</h3>
+          <p style={{ margin: "4px 0 0", fontSize: 11, color: "var(--cyber-text-muted)", letterSpacing: 1 }}>INITIAL_VS_CURRENT</p>
         </div>
         <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
-          {[{ c: "#10b981", l: "Tốt hơn" }, { c: "#ef4444", l: "Xấu hơn" }, { c: "#94a3b8", l: "Không đổi" }].map((t, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "center", gap: 4 }}>
-              <div style={{ width: 10, height: 10, borderRadius: "50%", background: t.c }} />
-              <span style={{ fontSize: 11, color: "#64748b" }}>{t.l}</span>
+          {[{ c: "var(--cyber-success)", l: "IMPROVED" }, { c: "var(--cyber-danger)", l: "DEGRADED" }, { c: "var(--cyber-text-muted)", l: "STABLE" }].map((t, i) => (
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <div style={{ width: 8, height: 8, background: t.c, boxShadow: `0 0 6px ${t.c}` }} />
+              <span className="tech-label" style={{ color: t.c }}>{t.l}</span>
             </div>
           ))}
         </div>
       </div>
       <table style={{ width: "100%", borderCollapse: "collapse" }}>
         <thead>
-          <tr style={{ background: "#f8fafc" }}>
-            {["Thuộc tính", "Lần đầu", "Mới nhất", "Thay đổi"].map(h => (
-              <th key={h} style={{ padding: "10px 20px", textAlign: "left", fontSize: 12, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5 }}>{h}</th>
+          <tr style={{ background: "rgba(0, 240, 255, 0.05)" }}>
+            {["PARAMETER", "T_INITIAL", "T_CURRENT", "DELTA"].map(h => (
+              <th key={h} style={{ padding: "12px 20px", textAlign: "left", fontSize: 11, fontFamily: 'var(--font-display)', color: "var(--cyber-accent)", letterSpacing: 1 }}>{h}</th>
             ))}
           </tr>
         </thead>
         <tbody>
           {rows.map((r, i) => {
             const delta = r.isNumeric && r.v1 !== null && r.v2 !== null ? r.v2 - r.v1 : null;
-            const rowBg = r.improved === true ? "#f0fdf4" : r.improved === false ? "#fef2f2" : "#fff";
+            const rowBg = r.improved === true ? "rgba(0, 255, 157, 0.05)" : r.improved === false ? "rgba(255, 0, 85, 0.05)" : "transparent";
             return (
-              <tr key={r.key} style={{ background: i % 2 === 0 ? rowBg : rowBg }}>
-                <td style={{ padding: "12px 20px", fontWeight: 600, fontSize: 13, color: "#374151", borderTop: "1px solid #f1f5f9" }}>{r.label}</td>
-                <td style={{ padding: "12px 20px", fontSize: 13, color: "#64748b", borderTop: "1px solid #f1f5f9" }}>
+              <tr key={r.key} style={{ background: rowBg }}>
+                <td style={{ padding: "12px 20px", fontFamily: 'var(--font-mono)', fontSize: 12, color: "var(--cyber-text)", borderTop: "1px solid var(--cyber-border)" }}>{r.label}</td>
+                <td style={{ padding: "12px 20px", fontSize: 13, color: "var(--cyber-text-muted)", borderTop: "1px solid var(--cyber-border)" }}>
                   {r.v1 !== null ? (r.isNumeric ? Number(r.v1).toFixed(r.key === "diem_qua_trinh" ? 1 : 0) : r.v1) : "—"}
                 </td>
-                <td style={{ padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "#1e293b", borderTop: "1px solid #f1f5f9" }}>
+                <td style={{ padding: "12px 20px", fontSize: 13, fontWeight: 700, color: "var(--cyber-text)", borderTop: "1px solid var(--cyber-border)" }}>
                   {r.v2 !== null ? (r.isNumeric ? Number(r.v2).toFixed(r.key === "diem_qua_trinh" ? 1 : 0) : r.v2) : "—"}
                 </td>
-                <td style={{ padding: "12px 20px", borderTop: "1px solid #f1f5f9" }}>
+                <td style={{ padding: "12px 20px", borderTop: "1px solid var(--cyber-border)" }}>
                   {delta !== null && r.changed ? (
-                    <span style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 13, fontWeight: 700, color: r.improved ? "#10b981" : "#ef4444" }}>
+                    <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 700, color: r.improved ? "var(--cyber-success)" : "var(--cyber-danger)", textShadow: r.improved ? "var(--cyber-success-glow)" : "none" }}>
                       {r.improved ? <MdTrendingUp /> : <MdTrendingDown />}
                       {delta > 0 ? "+" : ""}{delta.toFixed(r.key === "diem_qua_trinh" ? 1 : 0)}
                     </span>
                   ) : (
-                    <span style={{ color: "#94a3b8", fontSize: 13, display: "flex", alignItems: "center", gap: 4 }}>
-                      <MdRemove size={16} /> Không đổi
+                    <span style={{ color: "var(--cyber-text-muted)", fontSize: 12, display: "flex", alignItems: "center", gap: 4 }}>
+                      <MdRemove size={16} /> UNCHANGED
                     </span>
                   )}
                 </td>
@@ -141,19 +126,19 @@ export default function TienBoSoSanh() {
 
   if (loading) return (
     <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: 300 }}>
-      <div className="spinner" />
+      <div className="spinner" style={{ borderColor: 'var(--cyber-accent)', borderTopColor: 'transparent' }} />
     </div>
   );
 
   if (!data || data.history?.length === 0) return (
     <div style={{ maxWidth: 640 }}>
-      <div className="page-header">
-        <h1 style={{ fontSize: 26, fontWeight: 800, color: "#1e293b" }}>Tiến bộ của tôi</h1>
+      <div style={{ marginBottom: 32 }}>
+        <h1 style={{ fontSize: 24, color: 'var(--cyber-accent)', textShadow: 'var(--cyber-accent-glow)' }}>PROGRESS_TRACKER</h1>
       </div>
-      <div style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 20, padding: "48px 24px", textAlign: "center" }}>
-        <div style={{ fontSize: 64, marginBottom: 16 }}>📊</div>
-        <h2 style={{ color: "#475569" }}>Chưa có dữ liệu tiến bộ</h2>
-        <p style={{ color: "#64748b" }}>Hãy hoàn thành bài tập và dự báo lại để xem sự tiến bộ của bạn.</p>
+      <div className="cyber-card" style={{ textAlign: "center" }}>
+        <div style={{ fontSize: 64, marginBottom: 16, color: "var(--cyber-text-muted)" }}>[NO_DATA]</div>
+        <h2 style={{ color: "var(--cyber-accent)", fontFamily: 'var(--font-display)' }}>AWAITING_METRICS</h2>
+        <p style={{ color: "var(--cyber-text-muted)", fontFamily: 'var(--font-mono)' }}>Complete assignments and run predictions to populate tracking nodes.</p>
       </div>
     </div>
   );
@@ -164,37 +149,37 @@ export default function TienBoSoSanh() {
     <div style={{ paddingBottom: 48 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 28 }}>
         <div>
-          <h1 style={{ fontSize: 26, fontWeight: 800, color: "#1e293b", margin: 0 }}>Tiến bộ của tôi</h1>
-          <p style={{ color: "#64748b", margin: "4px 0 0" }}>Lịch sử và so sánh kết quả dự báo</p>
+          <h1 style={{ fontSize: 24, color: 'var(--cyber-accent)', textShadow: 'var(--cyber-accent-glow)', margin: 0 }}>PROGRESS_TRACKER</h1>
+          <p style={{ color: "var(--cyber-text-muted)", fontFamily: 'var(--font-mono)', fontSize: 12, letterSpacing: 1, margin: "4px 0 0" }}>HISTORICAL_RISK_COMPARISON</p>
         </div>
-        <button onClick={load} style={{ background: "#f1f5f9", border: "none", borderRadius: 10, padding: "9px 16px", cursor: "pointer", display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "#475569" }}>
-          <MdRefresh size={16} /> Làm mới
+        <button onClick={load} className="cyber-btn" style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <MdRefresh size={16} /> SYNC_DATA
         </button>
       </div>
 
       {/* Thống kê bài tập */}
       {exercises && exercises.done_count > 0 && (
-        <div style={{ background: "#fff", borderRadius: 20, border: "1px solid #e2e8f0", padding: "24px", marginBottom: 28, boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}>
+        <div className="cyber-card" style={{ padding: "24px", marginBottom: 28 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-            <h3 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: "#1e293b" }}>📚 Thống kê Luyện tập</h3>
+            <h3 style={{ margin: 0, fontSize: 16, fontFamily: 'var(--font-display)', color: "var(--cyber-text)" }}>TRAINING_STATISTICS</h3>
             {exercises.done_count >= 3 && exercises.score_percent >= 75 && (
-              <span style={{ background: "#ecfdf5", color: "#10b981", padding: "6px 14px", borderRadius: 20, fontSize: 13, fontWeight: 700, border: "1px solid #6ee7b7", display: "flex", alignItems: "center", gap: 6 }}>
-                🎉 Sinh viên có tiến bộ đáng kể
+              <span className="cyber-badge cyber-badge-success" style={{ display: "flex", alignItems: "center", gap: 6, boxShadow: "var(--cyber-success-glow)" }}>
+                🎉 SIGNIFICANT_IMPROVEMENT_DETECTED
               </span>
             )}
           </div>
           <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
-            <div style={{ flex: 1, minWidth: 120, background: "#f8fafc", borderRadius: 12, padding: "16px", border: "1px solid #f1f5f9", textAlign: "center" }}>
-              <div style={{ fontSize: 13, color: "#64748b", fontWeight: 600, marginBottom: 4 }}>Số câu đã làm</div>
-              <div style={{ fontSize: 24, fontWeight: 800, color: "#3b82f6" }}>{exercises.done_count}</div>
+            <div style={{ flex: 1, minWidth: 120, background: "rgba(0, 240, 255, 0.05)", borderRadius: 4, padding: "16px", border: "1px solid var(--cyber-border)", textAlign: "center" }}>
+              <div className="tech-label" style={{ marginBottom: 8 }}>TASKS_COMPLETED</div>
+              <div style={{ fontSize: 24, fontFamily: 'var(--font-display)', color: "var(--cyber-accent)", textShadow: "var(--cyber-accent-glow)" }}>{exercises.done_count}</div>
             </div>
-            <div style={{ flex: 1, minWidth: 120, background: "#f8fafc", borderRadius: 12, padding: "16px", border: "1px solid #f1f5f9", textAlign: "center" }}>
-              <div style={{ fontSize: 13, color: "#64748b", fontWeight: 600, marginBottom: 4 }}>Số câu đúng</div>
-              <div style={{ fontSize: 24, fontWeight: 800, color: "#10b981" }}>{exercises.correct_count}</div>
+            <div style={{ flex: 1, minWidth: 120, background: "rgba(0, 255, 157, 0.05)", borderRadius: 4, padding: "16px", border: "1px solid var(--cyber-success)", textAlign: "center" }}>
+              <div className="tech-label" style={{ marginBottom: 8, color: "var(--cyber-success)" }}>TASKS_CORRECT</div>
+              <div style={{ fontSize: 24, fontFamily: 'var(--font-display)', color: "var(--cyber-success)", textShadow: "var(--cyber-success-glow)" }}>{exercises.correct_count}</div>
             </div>
-            <div style={{ flex: 1, minWidth: 120, background: "#f8fafc", borderRadius: 12, padding: "16px", border: "1px solid #f1f5f9", textAlign: "center" }}>
-              <div style={{ fontSize: 13, color: "#64748b", fontWeight: 600, marginBottom: 4 }}>Tỷ lệ đúng</div>
-              <div style={{ fontSize: 24, fontWeight: 800, color: exercises.score_percent >= 75 ? "#10b981" : "#f59e0b" }}>{exercises.score_percent}%</div>
+            <div style={{ flex: 1, minWidth: 120, background: exercises.score_percent >= 75 ? "rgba(0, 255, 157, 0.05)" : "rgba(255, 183, 3, 0.05)", borderRadius: 4, padding: "16px", border: `1px solid ${exercises.score_percent >= 75 ? "var(--cyber-success)" : "var(--cyber-warning)"}`, textAlign: "center" }}>
+              <div className="tech-label" style={{ marginBottom: 8, color: exercises.score_percent >= 75 ? "var(--cyber-success)" : "var(--cyber-warning)" }}>ACCURACY_RATE</div>
+              <div style={{ fontSize: 24, fontFamily: 'var(--font-display)', color: exercises.score_percent >= 75 ? "var(--cyber-success)" : "var(--cyber-warning)", textShadow: exercises.score_percent >= 75 ? "var(--cyber-success-glow)" : "none" }}>{exercises.score_percent}%</div>
             </div>
           </div>
         </div>
@@ -203,23 +188,24 @@ export default function TienBoSoSanh() {
       {/* Improvement banner */}
       {improvement && (
         <div style={{
-          borderRadius: 20, padding: "24px 32px", marginBottom: 28, color: "#fff",
+          borderRadius: 4, padding: "24px 32px", marginBottom: 28, color: "var(--cyber-text)",
           background: improvement.is_improved
-            ? "linear-gradient(135deg, #059669, #10b981)"
-            : "linear-gradient(135deg, #dc2626, #ef4444)",
-          boxShadow: "0 8px 24px rgba(0,0,0,0.12)"
+            ? "rgba(0, 255, 157, 0.1)"
+            : "rgba(255, 0, 85, 0.1)",
+          border: `1px solid ${improvement.is_improved ? "var(--cyber-success)" : "var(--cyber-danger)"}`,
+          boxShadow: improvement.is_improved ? "inset 0 0 20px rgba(0, 255, 157, 0.2)" : "inset 0 0 20px rgba(255, 0, 85, 0.2)"
         }}>
           <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
-            <div style={{ fontSize: 48 }}>{improvement.is_improved ? "🚀" : "💪"}</div>
+            <div style={{ fontSize: 40 }}>{improvement.is_improved ? "🚀" : "⚠️"}</div>
             <div>
-              <h2 style={{ margin: "0 0 6px", fontSize: 20 }}>
+              <h2 style={{ margin: "0 0 6px", fontSize: 20, fontFamily: 'var(--font-display)', color: improvement.is_improved ? "var(--cyber-success)" : "var(--cyber-danger)" }}>
                 {improvement.is_improved
-                  ? `Xuất sắc! Giảm ${improvement.delta_percent}% rủi ro`
-                  : `Cần cố gắng thêm! Rủi ro tăng ${Math.abs(improvement.delta_percent)}%`}
+                  ? `EXCELLENT // RISK REDUCED BY ${improvement.delta_percent}%`
+                  : `WARNING // RISK INCREASED BY ${Math.abs(improvement.delta_percent)}%`}
               </h2>
-              <p style={{ margin: 0, opacity: 0.9, fontSize: 14 }}>
-                Từ <strong>{improvement.first_score}%</strong> (lần đầu) → <strong>{improvement.last_score}%</strong> (mới nhất)
-                — Qua <strong>{improvement.sessions_count}</strong> lần đánh giá
+              <p style={{ margin: 0, opacity: 0.9, fontSize: 13, fontFamily: 'var(--font-mono)', letterSpacing: 1 }}>
+                FROM <strong>{improvement.first_score}%</strong> (INITIAL) TO <strong>{improvement.last_score}%</strong> (CURRENT)
+                — ACROSS <strong>{improvement.sessions_count}</strong> SCANS
               </p>
             </div>
           </div>
@@ -227,19 +213,19 @@ export default function TienBoSoSanh() {
       )}
 
       {/* Risk trend chart - simple visual */}
-      <div style={{ background: "#fff", borderRadius: 20, border: "1px solid #e2e8f0", padding: "24px", marginBottom: 28, boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}>
-        <h3 style={{ margin: "0 0 20px", fontSize: 16, fontWeight: 800, color: "#1e293b" }}>📈 Xu hướng rủi ro</h3>
+      <div className="cyber-card" style={{ marginBottom: 28 }}>
+        <h3 style={{ margin: "0 0 20px", fontSize: 16, fontFamily: 'var(--font-display)', color: "var(--cyber-accent)" }}>📈 RISK_TRAJECTORY</h3>
         <div style={{ display: "flex", alignItems: "flex-end", gap: 12, height: 100 }}>
           {history.map((s, i) => {
             const pct = s.risk_score_percent;
-            const color = pct >= 65 ? "#ef4444" : pct >= 40 ? "#f59e0b" : "#10b981";
+            const color = pct >= 65 ? "var(--cyber-danger)" : pct >= 40 ? "var(--cyber-warning)" : "var(--cyber-success)";
             const barH = Math.max((pct / 100) * 80, 8);
             return (
-              <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color }}>{pct}%</div>
-                <div style={{ width: "100%", height: barH, background: color, borderRadius: "6px 6px 0 0", transition: "height 1s ease", maxWidth: 48 }} title={`Lần ${i + 1}: ${pct}%`} />
-                <div style={{ fontSize: 10, color: "#94a3b8", textAlign: "center" }}>
-                  {s.is_repredict ? "↩" : `L${i + 1}`}
+              <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
+                <div style={{ fontSize: 10, fontFamily: 'var(--font-mono)', color }}>{pct}%</div>
+                <div style={{ width: "100%", height: barH, background: color, borderTop: `2px solid #fff`, transition: "height 1s ease", maxWidth: 48, opacity: 0.8, boxShadow: `0 0 10px ${color}` }} title={`SCAN_${i + 1}: ${pct}%`} />
+                <div style={{ fontSize: 9, color: "var(--cyber-text-muted)", textAlign: "center", letterSpacing: 1 }}>
+                  {s.is_repredict ? "🔄" : `S${i + 1}`}
                 </div>
               </div>
             );
@@ -251,9 +237,6 @@ export default function TienBoSoSanh() {
       {/* Compare table */}
       {history.length >= 2 && (
         <div>
-          <h3 style={{ fontSize: 16, fontWeight: 800, color: "#1e293b", marginBottom: 16 }}>
-            🔍 So sánh chi tiết: Lần đầu vs Lần mới nhất
-          </h3>
           <CompareTable history={history} />
         </div>
       )}

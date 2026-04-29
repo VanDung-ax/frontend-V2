@@ -25,25 +25,31 @@ const parseToBlocks = (text) => {
   return blocks;
 };
 
-const MindMapBoxes = ({ text, color }) => {
+const MindMapBoxes = ({ text, type }) => {
   const blocks = parseToBlocks(text);
   if (blocks.length === 0) return null;
-  if (blocks.length === 1) return <div style={{ lineHeight: 1.6 }}>{blocks[0]}</div>;
+  if (blocks.length === 1) return <div style={{ lineHeight: 1.6, color: 'var(--cyber-text)' }}>{blocks[0]}</div>;
+
+  const colorVar = type === 'warning' ? 'var(--cyber-warning)' : type === 'primary' ? 'var(--cyber-accent)' : 'var(--cyber-success)';
 
   return (
     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 16, marginTop: 16 }}>
       {blocks.map((b, i) => (
         <div key={i} style={{
-          background: `${color}0A`, 
-          border: `1px solid ${color}33`,
-          borderLeft: `4px solid ${color}`,
-          borderRadius: 12, 
+          background: `rgba(0, 0, 0, 0.2)`, 
+          border: `1px solid rgba(255,255,255,0.1)`,
+          borderLeft: `3px solid ${colorVar}`,
           padding: 16,
-          fontSize: 14,
-          color: "#334155",
+          fontFamily: 'var(--font-mono)',
+          fontSize: 13,
+          color: "var(--cyber-text-muted)",
           lineHeight: 1.5,
-          boxShadow: "0 2px 8px rgba(0,0,0,0.02)"
+          position: "relative",
+          overflow: "hidden"
         }}>
+          <div style={{ position: "absolute", top: 0, right: 0, fontSize: 10, padding: "2px 6px", background: "rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.5)" }}>
+            SEQ_{i+1}
+          </div>
           {b}
         </div>
       ))}
@@ -92,7 +98,6 @@ export default function LoTrinhHocTap() {
         const progressRes = await getProgress(mssv);
         if (progressRes.data?.history?.length > 0) {
           const latest = progressRes.data.history[progressRes.data.history.length - 1];
-          // Lấy chính xác tên môn học thực tế từ dữ liệu dự báo. Nếu chưa upload file mới, sẽ hiện chữ vui lòng upload
           if (latest.ten_mon_hoc) {
              setMonHoc(latest.ten_mon_hoc);
           } else {
@@ -145,102 +150,106 @@ export default function LoTrinhHocTap() {
         .roadmap-container { position: relative; padding-left: 40px; margin-top: 40px; }
         .roadmap-container::before {
           content: ""; position: absolute; left: 15px; top: 0; bottom: 0;
-          width: 4px; background: linear-gradient(to bottom, #6366f1, #c084fc);
-          border-radius: 4px;
+          width: 2px; background: rgba(0, 240, 255, 0.3);
+          box-shadow: var(--cyber-accent-glow);
         }
         .roadmap-node {
           position: relative; margin-bottom: 40px;
           animation: fadeIn 0.6s ease both;
-          background: #fff; padding: 24px; border-radius: 16px;
-          box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-          border: 1px solid #e2e8f0;
+          background: var(--cyber-card); padding: 24px; border-radius: 4px;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+          border: 1px solid var(--cyber-border);
         }
         .roadmap-node::before {
           content: ""; position: absolute; left: -34px; top: 24px;
-          width: 20px; height: 20px; border-radius: 50%;
-          background: #fff; border: 4px solid #6366f1;
-          box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
+          width: 16px; height: 16px; border-radius: 50%;
+          background: var(--cyber-bg); border: 2px solid var(--cyber-accent);
+          box-shadow: var(--cyber-accent-glow);
           z-index: 1;
         }
-        .node-title { font-size: 18px; font-weight: 800; color: #1e293b; margin-bottom: 12px; display: flex; alignItems: center; gap: 8px; }
-        .node-content { font-size: 15px; color: #475569; }
+        .node-title { font-family: var(--font-display); font-size: 18px; font-weight: 800; color: var(--cyber-accent); margin-bottom: 12px; display: flex; alignItems: center; gap: 8px; letter-spacing: 1px; }
+        .node-content { font-size: 14px; color: var(--cyber-text); font-family: var(--font-mono); }
         
-        .node-0::before { border-color: #f59e0b; box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.2); }
-        .node-1::before { border-color: #3b82f6; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2); }
-        .node-2::before { border-color: #10b981; box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2); }
+        .node-0::before { border-color: var(--cyber-warning); box-shadow: 0 0 10px rgba(255, 183, 3, 0.5); }
+        .node-1::before { border-color: var(--cyber-accent); }
+        .node-2::before { border-color: var(--cyber-success); box-shadow: var(--cyber-success-glow); }
+        
+        .node-0 { border-top: 2px solid var(--cyber-warning); }
+        .node-1 { border-top: 2px solid var(--cyber-accent); }
+        .node-2 { border-top: 2px solid var(--cyber-success); }
       `}</style>
 
-      <div className="page-header" style={{ marginBottom: 32 }}>
-        <h1 style={{ fontSize: 28, fontWeight: 800, color: "#1e293b" }}>Lộ trình học tập AI</h1>
-        <p style={{ color: "#64748b", marginTop: 8, fontSize: 15 }}>
-          Cá nhân hóa lộ trình dựa trên môn học và lý do rớt của bạn.
+      <div style={{ marginBottom: 32 }}>
+        <h1 style={{ fontSize: 24, color: 'var(--cyber-accent)', textShadow: 'var(--cyber-accent-glow)', margin: 0 }}>AI_LEARNING_PATH</h1>
+        <p style={{ color: "var(--cyber-text-muted)", fontFamily: 'var(--font-mono)', fontSize: 12, letterSpacing: 1, margin: "4px 0 0" }}>
+          PERSONALIZED_RECOVERY_PROTOCOL
         </p>
       </div>
 
       {!roadmapData && (
-        <div style={{ background: "#fff", borderRadius: 20, padding: 32, boxShadow: "0 4px 12px rgba(0,0,0,0.04)", border: "1px solid #e2e8f0" }}>
-          <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 20, display: "flex", alignItems: "center", gap: 8 }}>
-            <MdAutoAwesome color="#6366f1" size={24} />
-            Khởi tạo lộ trình mới
+        <div className="cyber-card">
+          <h2 style={{ fontSize: 16, fontFamily: 'var(--font-display)', marginBottom: 20, display: "flex", alignItems: "center", gap: 8, color: "var(--cyber-accent)" }}>
+            <MdAutoAwesome size={24} />
+            INITIALIZE_NEW_PATH
           </h2>
           
           <form onSubmit={handleGenerate} style={{ display: "flex", flexDirection: "column", gap: 20 }}>
             <div style={{ display: "flex", gap: 20 }}>
               <div style={{ flex: 1 }}>
-                <label style={{ display: "block", marginBottom: 8, fontWeight: 600, color: "#334155" }}>MSSV</label>
-                <input type="text" value={mssv} disabled className="form-control" style={{ background: "#f8fafc" }} />
+                <label className="tech-label" style={{ display: "block", marginBottom: 8 }}>STUDENT_ID</label>
+                <input type="text" value={mssv} disabled className="cyber-input" style={{ opacity: 0.7 }} />
               </div>
               <div style={{ flex: 1 }}>
-                <label style={{ display: "block", marginBottom: 8, fontWeight: 600, color: "#334155" }}>Ngành học</label>
-                <input type="text" value={nganh} disabled className="form-control" style={{ background: "#f8fafc" }} />
+                <label className="tech-label" style={{ display: "block", marginBottom: 8 }}>MAJOR</label>
+                <input type="text" value={nganh} disabled className="cyber-input" style={{ opacity: 0.7 }} />
               </div>
             </div>
 
             <div>
-              <label style={{ display: "block", marginBottom: 8, fontWeight: 600, color: "#334155" }}>Môn học cần cải thiện *</label>
+              <label className="tech-label" style={{ display: "block", marginBottom: 8 }}>TARGET_SUBJECT *</label>
               <input 
                 type="text" 
-                value={monHoc || "Chưa có dữ liệu môn học. Xin vui lòng upload lại file CSV"} 
+                value={monHoc || "DATA_MISSING_PLEASE_UPDATE_CORE"} 
                 disabled 
-                className="form-control"
-                style={{ background: "#f8fafc", color: monHoc ? "#334155" : "#ef4444" }}
+                className="cyber-input"
+                style={{ opacity: 0.7, color: monHoc ? "var(--cyber-accent)" : "var(--cyber-danger)" }}
               />
             </div>
 
             <div>
-              <label style={{ display: "block", marginBottom: 8, fontWeight: 600, color: "#334155" }}>Lý do khó khăn / rớt môn *</label>
+              <label className="tech-label" style={{ display: "block", marginBottom: 8 }}>DIFFICULTY_REASONS *</label>
               <textarea 
                 value={lyDo} 
                 onChange={(e) => setLyDo(e.target.value)} 
-                placeholder="VD: Thiếu tài liệu ôn tập, chưa hiểu rõ OOP, vắng học nhiều..." 
-                className="form-control"
+                placeholder="INPUT_FAILURE_METRICS (e.g., LACK_OF_MATERIALS, KNOWLEDGE_GAPS...)" 
+                className="cyber-input"
                 rows={3}
                 required
               />
             </div>
 
             {error && (
-              <div style={{ background: "#fef2f2", color: "#b91c1c", padding: "12px 16px", borderRadius: 8, fontSize: 14, display: "flex", alignItems: "center", gap: 8 }}>
+              <div style={{ background: "rgba(255, 0, 85, 0.1)", color: "var(--cyber-danger)", padding: "12px 16px", border: "1px solid var(--cyber-danger)", fontSize: 13, display: "flex", alignItems: "center", gap: 8, fontFamily: 'var(--font-mono)' }}>
                 <MdErrorOutline size={20} />
-                {error}
+                ERR: {error}
               </div>
             )}
 
             <button 
               type="submit" 
               disabled={loading}
+              className="cyber-btn cyber-btn-primary"
               style={{
-                background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
-                color: "#fff", border: "none", borderRadius: 10, padding: "14px 24px",
-                fontSize: 16, fontWeight: 600, cursor: loading ? "not-allowed" : "pointer",
+                width: "100%", padding: "16px",
+                fontSize: 14, cursor: loading ? "not-allowed" : "pointer",
                 display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
-                opacity: loading ? 0.7 : 1, transition: "all 0.2s"
+                opacity: loading ? 0.7 : 1
               }}
             >
               {loading ? (
-                <><div className="spinner" style={{ width: 20, height: 20, borderWidth: 2, borderColor: "#fff", borderTopColor: "transparent" }} /> Đang phân tích...</>
+                <><div className="spinner" style={{ width: 20, height: 20, borderWidth: 2, borderColor: "var(--cyber-bg)", borderTopColor: "transparent" }} /> COMPUTING_PATH...</>
               ) : (
-                <><MdAutoAwesome size={20} /> Tạo lộ trình học tập</>
+                <><MdAutoAwesome size={20} /> GENERATE_PROTOCOL</>
               )}
             </button>
           </form>
@@ -249,47 +258,48 @@ export default function LoTrinhHocTap() {
 
       {roadmapData && (
         <div style={{ animation: "fadeIn 0.5s ease" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "#f8fafc", padding: "16px 24px", borderRadius: 16, border: "1px solid #e2e8f0", marginBottom: 24 }}>
+          <div className="cyber-card" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px 24px", marginBottom: 24, background: "rgba(0, 240, 255, 0.05)" }}>
             <div>
-              <div style={{ fontSize: 13, color: "#64748b", fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.5 }}>Môn học mục tiêu</div>
-              <div style={{ fontSize: 18, fontWeight: 800, color: "#0f172a", marginTop: 4 }}>{monHoc}</div>
+              <div className="tech-label">TARGET_SUBJECT</div>
+              <div style={{ fontSize: 18, fontFamily: 'var(--font-display)', color: "var(--cyber-text)", marginTop: 4 }}>{monHoc}</div>
             </div>
             <button 
               onClick={handleReset}
-              style={{ background: "#fff", border: "1px solid #cbd5e1", borderRadius: 8, padding: "8px 16px", fontSize: 14, fontWeight: 600, color: "#475569", cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}
+              className="cyber-btn"
+              style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11 }}
             >
-              <MdRefresh size={18} /> Làm mới
+              <MdRefresh size={16} /> RESET_PROTOCOL
             </button>
           </div>
 
           <div className="roadmap-container">
             {/* Node 0: Lời khuyên */}
             <div className="roadmap-node node-0" style={{ animationDelay: "0.1s" }}>
-              <div className="node-title" style={{ color: "#d97706" }}>
-                <MdAutoAwesome size={24} /> Lời khuyên tổng quan
+              <div className="node-title" style={{ color: "var(--cyber-warning)" }}>
+                <MdAutoAwesome size={24} /> NODE_00 // SYSTEM_ADVICE
               </div>
-              <div className="node-content" style={{ lineHeight: 1.6 }}>
+              <div className="node-content" style={{ lineHeight: 1.6, color: "var(--cyber-text-muted)" }}>
                 {roadmapData.loi_khuyen}
               </div>
             </div>
 
             {/* Node 1: Tuần 1 */}
             <div className="roadmap-node node-1" style={{ animationDelay: "0.2s" }}>
-              <div className="node-title" style={{ color: "#2563eb" }}>
-                <MdSchool size={24} /> Mục tiêu Tuần 1
+              <div className="node-title">
+                <MdSchool size={24} /> NODE_01 // PHASE_ONE
               </div>
               <div className="node-content">
-                <MindMapBoxes text={roadmapData.tuan_1} color="#2563eb" />
+                <MindMapBoxes text={roadmapData.tuan_1} type="primary" />
               </div>
             </div>
 
             {/* Node 2: Tuần 2 */}
             <div className="roadmap-node node-2" style={{ animationDelay: "0.3s" }}>
-              <div className="node-title" style={{ color: "#059669" }}>
-                <MdSchool size={24} /> Mục tiêu Tuần 2
+              <div className="node-title" style={{ color: "var(--cyber-success)" }}>
+                <MdSchool size={24} /> NODE_02 // PHASE_TWO
               </div>
               <div className="node-content">
-                <MindMapBoxes text={roadmapData.tuan_2} color="#059669" />
+                <MindMapBoxes text={roadmapData.tuan_2} type="success" />
               </div>
             </div>
           </div>

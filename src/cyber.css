@@ -1,0 +1,329 @@
+/* Cyberpunk Theme for Sinhvien Portal */
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700;800;900&display=swap');
+
+.cyber-theme {
+  --cyber-bg: #050b14;
+  --cyber-bg-alt: #0a1128;
+  --cyber-card: #0c1631;
+  --cyber-border: rgba(0, 240, 255, 0.2);
+  --cyber-border-glow: rgba(0, 240, 255, 0.4);
+  
+  --cyber-accent: #00f0ff;
+  --cyber-accent-hover: #00c3d9;
+  --cyber-accent-glow: 0 0 10px rgba(0, 240, 255, 0.6);
+  
+  --cyber-success: #00ff9d;
+  --cyber-success-glow: 0 0 10px rgba(0, 255, 157, 0.6);
+  
+  --cyber-danger: #ff0055;
+  --cyber-warning: #ffb703;
+  --cyber-purple: #b5179e;
+
+  --cyber-text: #e2e8f0;
+  --cyber-text-muted: #8ba1bb;
+  --cyber-text-dark: #1e293b;
+  
+  --font-mono: 'Roboto Mono', monospace;
+  --font-display: 'Orbitron', sans-serif;
+  
+  background-color: var(--cyber-bg);
+  color: var(--cyber-text);
+  min-height: 100vh;
+  font-family: var(--font-mono);
+}
+
+.cyber-theme h1, 
+.cyber-theme h2, 
+.cyber-theme h3, 
+.cyber-theme h4, 
+.cyber-theme h5, 
+.cyber-theme h6 {
+  font-family: var(--font-display);
+  letter-spacing: 1px;
+}
+
+/* ── Typography ─────────────────────────────────── */
+.cyber-theme .tech-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--cyber-accent);
+}
+
+/* ── Layout & Containers ────────────────────────── */
+.cyber-layout {
+  display: flex;
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Background grid effect */
+.cyber-layout::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
+  background-size: 30px 30px;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.cyber-sidebar {
+  width: 260px;
+  background: rgba(5, 11, 20, 0.8);
+  backdrop-filter: blur(10px);
+  border-right: 1px solid var(--cyber-border);
+  display: flex;
+  flex-direction: column;
+  z-index: 10;
+}
+
+.cyber-sidebar-header {
+  padding: 24px 20px;
+  border-bottom: 1px solid var(--cyber-border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cyber-logo-text {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--cyber-accent);
+  text-shadow: var(--cyber-accent-glow);
+  letter-spacing: 2px;
+}
+
+.cyber-nav {
+  padding: 20px 0;
+  flex: 1;
+}
+
+.cyber-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 24px;
+  color: var(--cyber-text-muted);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  transition: all 0.2s;
+  border-left: 3px solid transparent;
+  position: relative;
+}
+
+.cyber-nav-item:hover {
+  background: rgba(0, 240, 255, 0.05);
+  color: var(--cyber-text);
+}
+
+.cyber-nav-item.active {
+  background: linear-gradient(90deg, rgba(0, 240, 255, 0.15) 0%, transparent 100%);
+  color: var(--cyber-accent);
+  border-left-color: var(--cyber-accent);
+  text-shadow: 0 0 8px rgba(0, 240, 255, 0.4);
+}
+
+.cyber-nav-item.active::after {
+  content: '';
+  position: absolute;
+  left: -3px; top: 0; bottom: 0; width: 3px;
+  background: var(--cyber-accent);
+  box-shadow: var(--cyber-accent-glow);
+}
+
+.cyber-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  z-index: 5;
+}
+
+.cyber-topbar {
+  height: 64px;
+  border-bottom: 1px solid var(--cyber-border);
+  background: rgba(5, 11, 20, 0.6);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+}
+
+.cyber-content {
+  flex: 1;
+  padding: 32px;
+  overflow-y: auto;
+}
+
+/* ── Cards & Elements ───────────────────────────── */
+.cyber-card {
+  background: var(--cyber-card);
+  border: 1px solid var(--cyber-border);
+  border-radius: 4px;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  transition: all 0.3s;
+}
+
+.cyber-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; width: 30px; height: 30px;
+  border-top: 2px solid var(--cyber-accent);
+  border-left: 2px solid var(--cyber-accent);
+  opacity: 0.5;
+}
+
+.cyber-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; right: 0; width: 30px; height: 30px;
+  border-bottom: 2px solid var(--cyber-accent);
+  border-right: 2px solid var(--cyber-accent);
+  opacity: 0.5;
+}
+
+.cyber-card:hover {
+  border-color: var(--cyber-border-glow);
+  box-shadow: inset 0 0 20px rgba(0, 240, 255, 0.05);
+}
+
+/* ── Buttons ────────────────────────────────────── */
+.cyber-btn {
+  background: transparent;
+  border: 1px solid var(--cyber-accent);
+  color: var(--cyber-accent);
+  padding: 10px 20px;
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.cyber-btn:hover {
+  background: rgba(0, 240, 255, 0.1);
+  box-shadow: var(--cyber-accent-glow);
+}
+
+.cyber-btn-primary {
+  background: var(--cyber-accent);
+  color: var(--cyber-bg);
+  box-shadow: var(--cyber-accent-glow);
+}
+
+.cyber-btn-primary:hover {
+  background: #fff;
+  color: var(--cyber-bg);
+}
+
+/* ── Inputs ─────────────────────────────────────── */
+.cyber-input {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--cyber-border);
+  color: var(--cyber-accent);
+  padding: 12px 16px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  outline: none;
+  transition: all 0.2s;
+  width: 100%;
+}
+
+.cyber-input:focus {
+  border-color: var(--cyber-accent);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+}
+
+/* ── Badges ─────────────────────────────────────── */
+.cyber-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border: 1px solid;
+}
+
+.cyber-badge-success { background: rgba(0, 255, 157, 0.1); color: var(--cyber-success); border-color: var(--cyber-success); }
+.cyber-badge-warning { background: rgba(255, 183, 3, 0.1); color: var(--cyber-warning); border-color: var(--cyber-warning); }
+.cyber-badge-danger { background: rgba(255, 0, 85, 0.1); color: var(--cyber-danger); border-color: var(--cyber-danger); }
+
+/* ── Nodes (For Lộ trình) ───────────────────────── */
+.cyber-node {
+  display: flex;
+  gap: 24px;
+  position: relative;
+  padding-bottom: 40px;
+}
+
+.cyber-node::before {
+  content: '';
+  position: absolute;
+  left: 11px; top: 24px; bottom: 0; width: 2px;
+  background: var(--cyber-border);
+}
+
+.cyber-node:last-child::before { display: none; }
+
+.cyber-node-indicator {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: var(--cyber-bg);
+  border: 2px solid var(--cyber-border);
+  position: relative;
+  z-index: 2;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.cyber-node.completed .cyber-node-indicator {
+  border-color: var(--cyber-success);
+  box-shadow: var(--cyber-success-glow);
+}
+
+.cyber-node.completed .cyber-node-indicator::after {
+  content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--cyber-success);
+}
+
+.cyber-node.active .cyber-node-indicator {
+  border-color: var(--cyber-accent);
+  box-shadow: var(--cyber-accent-glow);
+}
+
+.cyber-node.active .cyber-node-indicator::after {
+  content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--cyber-accent);
+}
+
+/* ── Scrollbar override for cyber theme ─────────── */
+.cyber-theme ::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); }
+.cyber-theme ::-webkit-scrollbar-thumb { background: rgba(0, 240, 255, 0.3); border-radius: 0; }
+.cyber-theme ::-webkit-scrollbar-thumb:hover { background: rgba(0, 240, 255, 0.6); }
+
+/* ── Avatar / Profile ───────────────────────────── */
+.cyber-avatar {
+  width: 40px; height: 40px;
+  border-radius: 0;
+  background: rgba(0, 240, 255, 0.1);
+  border: 1px solid var(--cyber-accent);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--cyber-accent);
+  font-family: var(--font-display);
+  font-weight: 700;
+  box-shadow: var(--cyber-accent-glow);
+}

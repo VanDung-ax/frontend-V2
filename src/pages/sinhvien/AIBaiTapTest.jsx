@@ -8,77 +8,102 @@ import {
 
 const OPTION_LABELS = ["A", "B", "C", "D"];
 
+const customStyles = `
+  .quiz-option {
+    transition: all 0.2s ease;
+    background: rgba(0, 240, 255, 0.05);
+    border: 1px solid var(--cyber-border);
+    color: var(--cyber-text);
+  }
+  .quiz-option:not(:disabled):hover {
+    transform: translateX(4px);
+    box-shadow: inset 0 0 10px rgba(0, 240, 255, 0.1);
+    border-color: var(--cyber-accent);
+  }
+  .quiz-option.selected {
+    background: rgba(0, 240, 255, 0.1);
+    border-color: var(--cyber-accent);
+    box-shadow: var(--cyber-accent-glow);
+  }
+  .quiz-option.correct {
+    background: rgba(0, 255, 157, 0.1) !important;
+    border-color: var(--cyber-success) !important;
+    box-shadow: var(--cyber-success-glow) !important;
+  }
+  .quiz-option.wrong {
+    background: rgba(255, 0, 85, 0.1) !important;
+    border-color: var(--cyber-danger) !important;
+    box-shadow: inset 0 0 10px rgba(255, 0, 85, 0.2) !important;
+  }
+`;
+
 function AIQuizCard({ question, index, onSelect, selectedIdx, result }) {
   const options = Object.values(question.dap_an);
   const correctIdx = options.indexOf(question.lua_chon_dung);
   
   return (
-    <div style={{
-      background: "#fff", borderRadius: 16, border: "1px solid #e2e8f0",
-      overflow: "hidden", boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
-      marginBottom: 16
-    }}>
-      <div style={{ padding: "16px 20px", borderBottom: "1px solid #f1f5f9" }}>
-        <div style={{ fontSize: 13, fontWeight: 700, color: "#6366f1", marginBottom: 6 }}>
-          CÂU {index + 1}
+    <div className="cyber-card" style={{ padding: 0, marginBottom: 20, overflow: "hidden" }}>
+      <div style={{ padding: "20px 24px", borderBottom: "1px solid var(--cyber-border)", background: "rgba(0, 240, 255, 0.02)" }}>
+        <div style={{ fontSize: 11, fontFamily: 'var(--font-mono)', color: "var(--cyber-accent)", marginBottom: 6, textTransform: "uppercase", letterSpacing: 1 }}>
+          SEQ_{index + 1}
         </div>
-        <p style={{ margin: 0, fontWeight: 700, fontSize: 15, color: "#1e293b", lineHeight: 1.5 }}>
+        <p style={{ margin: 0, fontFamily: 'var(--font-display)', fontSize: 16, color: "var(--cyber-text)", lineHeight: 1.5 }}>
           {question.cau_hoi}
         </p>
       </div>
 
       <div style={{ padding: "16px 20px", display: "flex", flexDirection: "column", gap: 10 }}>
         {options.map((opt, idx) => {
-          let bg = "#f8fafc", border = "#e2e8f0", color = "#374151";
+          let extraClass = "";
+          let iconColor = "var(--cyber-text-muted)";
           
           if (result) {
-            if (idx === correctIdx) { bg = "#ecfdf5"; border = "#6ee7b7"; color = "#065f46"; }
-            else if (idx === selectedIdx && idx !== correctIdx) { bg = "#fef2f2"; border = "#fca5a5"; color = "#991b1b"; }
-          } else if (selectedIdx === idx) { bg = "#eff6ff"; border = "#93c5fd"; color = "#1d4ed8"; }
+            if (idx === correctIdx) { extraClass = "correct"; iconColor = "var(--cyber-success)"; }
+            else if (idx === selectedIdx && idx !== correctIdx) { extraClass = "wrong"; iconColor = "var(--cyber-danger)"; }
+          } else if (selectedIdx === idx) { extraClass = "selected"; iconColor = "var(--cyber-accent)"; }
 
           return (
             <button
               key={idx}
               disabled={result !== null}
+              className={`quiz-option ${extraClass}`}
               onClick={() => onSelect(index, idx)}
               style={{
-                width: "100%", textAlign: "left", background: bg,
-                border: `1.5px solid ${border}`, borderRadius: 10,
-                padding: "10px 14px", cursor: result ? "default" : "pointer",
-                display: "flex", alignItems: "center", gap: 10, color
+                width: "100%", textAlign: "left",
+                borderRadius: 4, padding: "12px 16px", cursor: result ? "default" : "pointer",
+                display: "flex", alignItems: "center", gap: 12
               }}
             >
               <span style={{
-                width: 28, height: 28, borderRadius: "50%",
-                background: (result && idx === correctIdx) ? "#10b981" :
-                  (result && idx === selectedIdx && idx !== correctIdx) ? "#ef4444" :
-                  (selectedIdx === idx) ? "#3b82f6" : "#e2e8f0",
-                color: (result && (idx === correctIdx || (idx === selectedIdx && idx !== correctIdx))) || selectedIdx === idx ? "#fff" : "#64748b",
+                width: 24, height: 24,
+                border: `1px solid ${iconColor}`,
+                color: iconColor,
                 display: "flex", alignItems: "center", justifyContent: "center",
-                fontWeight: 800, fontSize: 13, flexShrink: 0
+                fontFamily: 'var(--font-mono)', fontSize: 12, flexShrink: 0,
+                boxShadow: extraClass ? `0 0 8px ${iconColor}` : 'none'
               }}>
                 {OPTION_LABELS[idx]}
               </span>
-              <span style={{ fontSize: 14, fontWeight: 500, flex: 1 }}>{opt}</span>
+              <span style={{ fontSize: 14, fontFamily: 'var(--font-mono)', flex: 1 }}>{opt}</span>
             </button>
           );
         })}
 
         {result && (
           <div style={{
-            marginTop: 8, padding: "14px 16px", borderRadius: 12,
-            background: result.is_correct ? "#f0fdf4" : "#fff7ed",
-            border: `1px solid ${result.is_correct ? "#86efac" : "#fed7aa"}`,
+            marginTop: 8, padding: "14px 16px", borderRadius: 4,
+            background: result.is_correct ? "rgba(0, 255, 157, 0.05)" : "rgba(255, 183, 3, 0.05)",
+            border: `1px solid ${result.is_correct ? "var(--cyber-success)" : "var(--cyber-warning)"}`,
             display: "flex", gap: 10, alignItems: "flex-start"
           }}>
             {result.is_correct
-              ? <MdCheckCircle size={20} color="#10b981" style={{ flexShrink: 0, marginTop: 1 }} />
-              : <MdTrendingDown size={20} color="#f97316" style={{ flexShrink: 0, marginTop: 1 }} />}
+              ? <MdCheckCircle size={20} color="var(--cyber-success)" style={{ flexShrink: 0, marginTop: 1 }} />
+              : <MdTrendingDown size={20} color="var(--cyber-warning)" style={{ flexShrink: 0, marginTop: 1 }} />}
             <div>
-              <div style={{ fontWeight: 700, fontSize: 13, color: result.is_correct ? "#166534" : "#c2410c", marginBottom: 4 }}>
-                {result.is_correct ? "Chính xác! 🎉" : "Chưa đúng — Giải thích:"}
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: 13, color: result.is_correct ? "var(--cyber-success)" : "var(--cyber-warning)", marginBottom: 4 }}>
+                {result.is_correct ? "MATCH_FOUND_CORRECT" : "ANOMALY_DETECTED // EXPLANATION:"}
               </div>
-              <div style={{ fontSize: 13, color: "#475569", lineHeight: 1.6 }}>
+              <div style={{ fontSize: 13, color: "var(--cyber-text-muted)", lineHeight: 1.6, fontFamily: 'var(--font-mono)' }}>
                 {question.giai_thich}
               </div>
             </div>
@@ -263,39 +288,37 @@ export default function AIBaiTapTest() {
   ];
 
   return (
-    <div style={{ paddingBottom: 48 }}>
-      <div className="page-header" style={{ marginBottom: 24 }}>
-        <h1 style={{ fontSize: 26, fontWeight: 800, color: "#1e293b", display: "flex", alignItems: "center", gap: 10 }}>
-          <MdAutoAwesome color="#8b5cf6" /> Bài tập Sinh tự động (AI)
+    <div style={{ paddingBottom: 48, maxWidth: 760, margin: "0 auto" }}>
+      <style>{customStyles}</style>
+      <div style={{ marginBottom: 32, textAlign: "center", paddingTop: 16 }}>
+        <h1 style={{ fontSize: 28, fontFamily: 'var(--font-display)', color: "var(--cyber-accent)", textShadow: "var(--cyber-accent-glow)", marginBottom: 8, display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
+          <MdAutoAwesome /> NEURAL_TRAINING_GROUND
         </h1>
-        <p style={{ color: "#64748b", marginTop: 4 }}>
-          Tạo bài tập tuỳ chỉnh theo môn học và cải thiện điểm dự báo nếu đạt trên 75%.
+        <p style={{ color: "var(--cyber-text-muted)", fontSize: 14, fontFamily: 'var(--font-mono)' }}>
+          AI-driven knowledge patching sequence. Score &gt; 75% to trigger risk parameter reset.
         </p>
       </div>
 
       {step === 'setup' && (
-        <div style={{ background: "#fff", borderRadius: 20, padding: "48px 32px", border: "1px solid #e2e8f0", boxShadow: "0 4px 16px rgba(0,0,0,0.05)", textAlign: "center" }}>
+        <div className="cyber-card" style={{ padding: "48px 32px", border: "1px solid var(--cyber-accent)", boxShadow: "inset 0 0 50px rgba(0, 240, 255, 0.05)", textAlign: "center" }}>
           <div style={{ marginBottom: 32 }}>
-            <div style={{ fontSize: 64, marginBottom: 16 }}>🚀</div>
-            <h2 style={{ fontSize: 26, fontWeight: 800, color: "#1e293b", marginBottom: 16 }}>Sẵn sàng luyện tập?</h2>
-            <p style={{ color: "#475569", fontSize: 16, maxWidth: 560, margin: "0 auto", lineHeight: 1.6 }}>
-              Hệ thống sẽ tự động tạo bài tập dựa trên môn học <strong>{monHoc || "chuyên ngành"}</strong> và tập trung khắc phục các rủi ro đã được cảnh báo của bạn. Các bài tập này sẽ được lưu lại để theo dõi tiến độ.
+            <div style={{ fontSize: 64, marginBottom: 16, textShadow: "var(--cyber-accent-glow)" }}>🚀</div>
+            <h2 style={{ fontSize: 24, fontFamily: 'var(--font-display)', color: "var(--cyber-text)", marginBottom: 16 }}>READY_FOR_CALIBRATION?</h2>
+            <p style={{ color: "var(--cyber-text-muted)", fontSize: 14, maxWidth: 560, margin: "0 auto", lineHeight: 1.6, fontFamily: 'var(--font-mono)' }}>
+              Core system will generate localized testing protocols for <strong>{monHoc || "chuyên ngành"}</strong> to address detected anomalies. Progression will be logged.
             </p>
           </div>
           <button 
             onClick={handleGenerate} 
             disabled={loadingAI}
+            className="cyber-btn cyber-btn-primary"
             style={{ 
-              background: "linear-gradient(135deg, #8b5cf6, #6366f1)", 
-              color: "#fff", border: "none", borderRadius: 14, padding: "18px 40px", 
-              fontWeight: 800, fontSize: 17, cursor: loadingAI ? "not-allowed" : "pointer",
-              display: "inline-flex", alignItems: "center", gap: 12, boxShadow: "0 10px 25px rgba(139, 92, 246, 0.3)",
-              transition: "transform 0.2s"
+              padding: "18px 40px", 
+              fontSize: 16, cursor: loadingAI ? "not-allowed" : "pointer",
+              display: "inline-flex", alignItems: "center", gap: 12
             }}
-            onMouseOver={e => !loadingAI && (e.currentTarget.style.transform = "scale(1.05)")}
-            onMouseOut={e => !loadingAI && (e.currentTarget.style.transform = "scale(1)")}
           >
-            {loadingAI ? <div className="spinner" style={{width:24, height:24}}/> : <><MdAutoAwesome size={26} /> Làm bài tập để ôn kiến thức và cải thiện rủi ro</>}
+            {loadingAI ? <div className="spinner" style={{width:24, height:24, borderColor: 'var(--cyber-bg)', borderTopColor: 'transparent'}}/> : <><MdAutoAwesome size={24} /> INITIALIZE_TRAINING_MODULE</>}
           </button>
         </div>
       )}
@@ -303,32 +326,34 @@ export default function AIBaiTapTest() {
       {(step === 'playing' || step === 'result') && (
         <div>
           {step === 'result' && (
-            <div style={{
-              background: score >= 75 ? "linear-gradient(135deg, #10b981, #059669)" : "linear-gradient(135deg, #f59e0b, #d97706)",
-              borderRadius: 20, padding: "32px", marginBottom: 24,
-              color: "#fff", textAlign: "center", boxShadow: "0 8px 24px rgba(0,0,0,0.15)"
+            <div className="cyber-card" style={{
+              background: score >= 75 ? "rgba(0, 255, 157, 0.05)" : "rgba(255, 183, 3, 0.05)",
+              border: `1px solid ${score >= 75 ? "var(--cyber-success)" : "var(--cyber-warning)"}`,
+              padding: "32px", marginBottom: 24, textAlign: "center",
+              boxShadow: score >= 75 ? "inset 0 0 30px rgba(0, 255, 157, 0.1)" : "inset 0 0 30px rgba(255, 183, 3, 0.1)"
             }}>
-              <div style={{ fontSize: 48, fontWeight: 900, marginBottom: 8 }}>{score}%</div>
-              <div style={{ fontSize: 18, fontWeight: 600 }}>
-                {score >= 75 ? "🎉 Tuyệt vời! Bạn đã đủ điều kiện để Cập nhật thông số học tập." : "Cố gắng lên! Bạn cần đạt trên 75% để được đánh giá lại tiến bộ."}
+              <div style={{ fontSize: 48, fontFamily: 'var(--font-display)', color: score >= 75 ? "var(--cyber-success)" : "var(--cyber-warning)", marginBottom: 8, textShadow: score >= 75 ? "var(--cyber-success-glow)" : "none" }}>{score}%</div>
+              <div style={{ fontSize: 16, fontFamily: 'var(--font-mono)', color: "var(--cyber-text)" }}>
+                {score >= 75 ? "STATUS: CALIBRATION_COMPLETE // Ready for parameter override." : "STATUS: SUB_OPTIMAL // Threshold 75% required."}
               </div>
               <button 
                 onClick={() => setStep('setup')}
-                style={{ marginTop: 16, background: "rgba(255,255,255,0.2)", border: "none", padding: "8px 16px", borderRadius: 8, color: "#fff", cursor: "pointer", fontWeight: 700 }}
+                className="cyber-btn"
+                style={{ marginTop: 16 }}
               >
-                Làm bài khác
+                REQUEST_NEW_MODULE
               </button>
             </div>
           )}
 
           {step === 'result' && score >= 75 && (
-            <div style={{ background: "#f0fdf4", borderRadius: 20, border: "1px solid #10b981", padding: 32, marginBottom: 24, boxShadow: "0 4px 16px rgba(16, 185, 129, 0.15)", textAlign: "center" }}>
-              <div style={{ fontSize: 48, marginBottom: 16 }}>🎉</div>
-              <h3 style={{ margin: "0 0 12px", fontSize: 22, fontWeight: 800, color: "#065f46" }}>
-                Sinh viên có tiến bộ đáng kể!
+            <div className="cyber-card" style={{ background: "rgba(0, 255, 157, 0.05)", border: "1px solid var(--cyber-success)", padding: 32, marginBottom: 24, boxShadow: "inset 0 0 20px rgba(0, 255, 157, 0.1)", textAlign: "center" }}>
+              <div style={{ fontSize: 48, marginBottom: 16, textShadow: "var(--cyber-success-glow)" }}>🎉</div>
+              <h3 style={{ margin: "0 0 12px", fontSize: 20, fontFamily: 'var(--font-display)', color: "var(--cyber-success)" }}>
+                PROGRESSION_LOGGED
               </h3>
-              <p style={{ color: "#166534", margin: 0, fontSize: 16 }}>
-                Kết quả luyện tập của bạn rất tốt. Hệ thống đã ghi nhận sự tiến bộ này vào hồ sơ học tập của bạn.
+              <p style={{ color: "var(--cyber-success)", margin: 0, fontSize: 14, fontFamily: 'var(--font-mono)' }}>
+                System recorded positive vector changes. Academic trajectory updated.
               </p>
             </div>
           )}
@@ -355,17 +380,16 @@ export default function AIBaiTapTest() {
           </div>
 
           {!graded && questions.length > 0 && (
-            <div style={{ marginTop: 24, textAlign: "center" }}>
+            <div className="cyber-card" style={{ marginTop: 24, textAlign: "center" }}>
+              <h3 style={{ margin: "0 0 16px", fontSize: 18, fontFamily: 'var(--font-display)', color: "var(--cyber-text)" }}>MODULE_COMPLETE?</h3>
+              <p style={{ color: "var(--cyber-text-muted)", marginBottom: 24, fontSize: 13, fontFamily: 'var(--font-mono)' }}>Submit data for evaluation.</p>
               <button 
                 onClick={handleGrade}
-                style={{
-                  background: "linear-gradient(135deg, #3b82f6, #2563eb)",
-                  color: "#fff", border: "none", borderRadius: 12, padding: "16px 40px",
-                  fontSize: 16, fontWeight: 800, cursor: "pointer", boxShadow: "0 4px 12px rgba(37, 99, 235, 0.3)"
-                }}
+                className="cyber-btn cyber-btn-primary"
+                style={{ padding: "16px 40px", display: "inline-flex", alignItems: "center" }}
               >
-                <MdCheckCircle style={{ verticalAlign: "middle", marginRight: 8 }} size={20} />
-                Nộp bài và Chấm điểm
+                <MdCheckCircle style={{ marginRight: 8 }} size={20} />
+                SUBMIT_MODULE
               </button>
             </div>
           )}

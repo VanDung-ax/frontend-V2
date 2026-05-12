@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
-import api from "../../services/api";
+import { changePassword } from "../../services/api";
 import {
   MdLockOutline,
   MdVisibility,
@@ -42,11 +42,11 @@ export default function DoiMatKhau() {
 
     setLoading(true);
     try {
-      const response = await api.post("/api/auth/change-password", {
-        username: user?.username,
-        old_password: form.old_password,
-        new_password: form.new_password,
-      });
+      const response = await changePassword(
+        user?.username,
+        form.old_password,
+        form.new_password
+      );
 
       if (response.data.status === "success") {
         setMsg({

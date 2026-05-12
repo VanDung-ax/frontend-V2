@@ -195,23 +195,6 @@ export default function LoginPage() {
             Hệ thống quản lý nội bộ. Quyền truy cập được giám sát.
           </p>
         </div>
-
-        {/* Footer */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            marginTop: 24,
-            fontSize: 12,
-            color: "rgba(255,255,255,0.4)",
-          }}
-        >
-          <span>© 2024 Hệ thống dự báo REAAC</span>
-          <div style={{ display: "flex", gap: 16 }}>
-            <span style={{ cursor: "pointer" }}>Privacy Policy</span>
-            <span style={{ cursor: "pointer" }}>Terms of Service</span>
-          </div>
-        </div>
         <div style={{ textAlign: "center", marginTop: 12 }}>
           <span
             style={{
@@ -232,7 +215,6 @@ export default function LoginPage() {
               }}
             />
             HỆ THỐNG ĐANG HOẠT ĐỘNG
-            <span style={{ marginLeft: 8 }}>v2.4.0-release</span>
           </span>
         </div>
       </div>

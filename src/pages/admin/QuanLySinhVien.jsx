@@ -296,34 +296,54 @@ export default function QuanLySinhVien() {
 
   const riskLevelLabels = [
     "THẤP (An toàn)",
-    "TRUNG BÌNH (Cảnh báo)",
+    "TRUNG BÌNH (Theo dõi)",
     "CAO (Nguy hiểm)",
   ];
 
   const riskLevelLabel = (score) => {
     if (score >= 0.65) return "CAO (Nguy hiểm)";
-    if (score >= 0.4) return "TRUNG BÌNH (Cảnh báo)";
+    if (score >= 0.4) return "TRUNG BÌNH (Theo dõi)";
     return "THẤP (An toàn)";
   };
 
-  const avgByRiskLevel = (field) => {
-    const aggregate = filtered.reduce((acc, item) => {
-      const label = riskLevelLabel(Number(item.risk_score) || 0);
-      const value = Number(item[field]);
-      if (!Number.isNaN(value)) {
-        if (!acc[label]) acc[label] = { total: 0, count: 0 };
-        acc[label].total += value;
-        acc[label].count += 1;
-      }
-      return acc;
-    }, {});
+  // Ngưỡng phân loại dựa trên giá trị thực tế từ file dữ liệu
+  // Chiều: giá trị cao = tốt (trừ tre_hoc: cao = xấu)
+  const numericThresholds = {
+    chuyen_can:        { danger: 40, warn: 70, unit: "%",   dangerLabel: "Nguy hiểm (<40%)",     warnLabel: "Theo dõi (40-70%)",     safeLabel: "An toàn (>70%)" },
+    thoi_gian_tu_hoc:  { danger: 30, warn: 60, unit: "h",   dangerLabel: "Nguy hiểm (<30h)",     warnLabel: "Theo dõi (30-60h)",     safeLabel: "An toàn (>60h)" },
+    diem_qua_trinh:    { danger: 4,  warn: 6,  unit: "đ",   dangerLabel: "Nguy hiểm (<4đ)",      warnLabel: "Theo dõi (4-6đ)",       safeLabel: "An toàn (>6đ)" },
+    hoan_thanh_bai_tap:{ danger: 40, warn: 70, unit: "%",   dangerLabel: "Nguy hiểm (<40%)",     warnLabel: "Theo dõi (40-70%)",     safeLabel: "An toàn (>70%)" },
+    tre_hoc:           { danger: 50, warn: 20, unit: " lần", dangerLabel: "Nguy hiểm (>50)",      warnLabel: "Theo dõi (20-50)",      safeLabel: "An toàn (<20)",  invert: true },
+  };
 
-    return riskLevelLabels.map((label) => ({
-      name: label,
-      value: aggregate[label]?.count
-        ? Number((aggregate[label].total / aggregate[label].count).toFixed(1))
-        : 0,
-    }));
+  const countByNumericLevel = (field) => {
+    const cfg = numericThresholds[field];
+    if (!cfg) return [];
+
+    const buckets = { danger: 0, warn: 0, safe: 0 };
+
+    filtered.forEach((item) => {
+      const value = Number(item[field]);
+      if (Number.isNaN(value)) return;
+
+      if (cfg.invert) {
+        // tre_hoc: giá trị CAO = nguy hiểm
+        if (value > cfg.danger) buckets.danger += 1;
+        else if (value >= cfg.warn) buckets.warn += 1;
+        else buckets.safe += 1;
+      } else {
+        // Các thuộc tính khác: giá trị THẤP = nguy hiểm
+        if (value < cfg.danger) buckets.danger += 1;
+        else if (value <= cfg.warn) buckets.warn += 1;
+        else buckets.safe += 1;
+      }
+    });
+
+    return [
+      { name: cfg.dangerLabel, value: buckets.danger },
+      { name: cfg.warnLabel,   value: buckets.warn },
+      { name: cfg.safeLabel,   value: buckets.safe },
+    ];
   };
 
   const countBy = (field, data = filtered) => {
@@ -340,8 +360,6 @@ export default function QuanLySinhVien() {
       Low: 1,
       Medium: 2,
       High: 3,
-
-      // Khai báo sẵn thêm cho các biểu đồ khác để chúng cũng xếp đẹp luôn
       Negative: 1,
       Neutral: 2,
       Positive: 3,
@@ -353,18 +371,12 @@ export default function QuanLySinhVien() {
       "Chưa xác định": 99,
     };
 
-    // Thực hiện ép sắp xếp theo thứ tự orderMap
     return result.sort((a, b) => {
       const valA = orderMap[a.name];
       const valB = orderMap[b.name];
-
-      // Nếu cả 2 nhãn đều nằm trong danh sách khai báo, xếp theo thứ tự 1, 2, 3
       if (valA !== undefined && valB !== undefined) return valA - valB;
-      // Nếu chỉ có 1 nhãn có, ưu tiên nhãn đó lên trước
       if (valA !== undefined) return -1;
       if (valB !== undefined) return 1;
-
-      // Mặc định thì xếp theo chữ cái A-Z
       return a.name.localeCompare(b.name);
     });
   };
@@ -390,11 +402,11 @@ export default function QuanLySinhVien() {
   const riskScoreColors = ["#22c55e", "#f59e0b", "#ef4444"];
 
   const chartCards = [
-    { title: "Chuyên cần", data: avgByRiskLevel("chuyen_can"), colorIndex: 1 },
-    { title: "Giờ tự học", data: avgByRiskLevel("thoi_gian_tu_hoc"), colorIndex: 2 },
-    { title: "Điểm quá trình", data: avgByRiskLevel("diem_qua_trinh"), colorIndex: 3 },
-    { title: "Hoàn thành BT (%)", data: avgByRiskLevel("hoan_thanh_bai_tap"), colorIndex: 4 },
-    { title: "Trễ học (buổi)", data: avgByRiskLevel("tre_hoc"), colorIndex: 5 },
+    { title: "Chuyên cần (SL sinh viên)", data: countByNumericLevel("chuyen_can"), colorIndex: 1 },
+    { title: "Giờ tự học (SL sinh viên)", data: countByNumericLevel("thoi_gian_tu_hoc"), colorIndex: 2 },
+    { title: "Điểm quá trình (SL sinh viên)", data: countByNumericLevel("diem_qua_trinh"), colorIndex: 3 },
+    { title: "Hoàn thành BT (SL sinh viên)", data: countByNumericLevel("hoan_thanh_bai_tap"), colorIndex: 4 },
+    { title: "Trễ học (SL sinh viên)", data: countByNumericLevel("tre_hoc"), colorIndex: 5 },
     { title: "Tài liệu ôn tập", data: countBy("tai_lieu_on_tap"), colorIndex: 0 },
     { title: "Loại môn học", data: countBy("loai_mon_hoc"), colorIndex: 1 },
     { title: "Hình thức thi", data: countBy("hinh_thuc_thi"), colorIndex: 2 },
@@ -454,55 +466,67 @@ export default function QuanLySinhVien() {
     );
   };
 
-  function BarChartCard({ title, data, colorIndex = 0 }) {
+  function BarChartCard({ title, data, colorIndex = 0, invertColor = false }) {
     // Hàm nhận diện từ khóa để tự động gán màu: Xanh - Cam - Đỏ
+    // invertColor = true: đảo ngược màu (dùng cho "trễ học" - ít = tốt, nhiều = xấu)
     const getBarColor = (name, defaultColor) => {
       if (!name) return defaultColor;
       const text = String(name).toLowerCase();
 
-      // Nhóm XANH LÁ (Thấp, An toàn, Low, Yes, Positive, Near...)
+      const GREEN = "#22c55e";
+      const AMBER = "#f59e0b";
+      const RED   = "#ef4444";
+
+      // Nhóm XANH — An toàn, Thấp, Ít, Low, Yes, Positive, Near...
       if (
+        text.includes("an toàn") ||
         text.includes("thấp") ||
+        text.startsWith("ít") ||
         text === "low" ||
         text === "near" ||
         text === "positive" ||
         text === "yes"
       ) {
-        return "#22c55e";
+        return GREEN;
       }
-      // Nhóm CAM (Trung bình, Medium, Moderate, Neutral...)
+      // Nhóm CAM — Theo dõi, Cảnh báo, Trung bình, TB, Medium, Moderate, Neutral...
       if (
+        text.includes("theo dõi") ||
+        text.includes("cảnh báo") ||
+        text.startsWith("tb") ||
         text.includes("trung bình") ||
         text === "medium" ||
         text === "moderate" ||
         text === "neutral"
       ) {
-        return "#f59e0b";
+        return AMBER;
       }
-      // Nhóm ĐỎ (Cao, Nguy hiểm, High, No, Negative, Far...)
+      // Nhóm ĐỎ — Nguy hiểm, Cao, Nhiều, High, No, Negative, Far...
       if (
+        text.includes("nguy hiểm") ||
         text.includes("cao") ||
+        text.startsWith("nhiều") ||
         text === "high" ||
         text === "far" ||
         text === "negative" ||
         text === "no"
       ) {
-        return "#ef4444";
+        return RED;
       }
 
-      return defaultColor; // Nếu không khớp chữ nào thì lấy màu mặc định
+      return defaultColor;
     };
 
     return (
-      <div className="card card-body" style={{ minHeight: 260, padding: 14 }}>
+      <div className="card card-body" style={{ minHeight: 280, padding: 14 }}>
         <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12 }}>
           {title}
         </div>
-        <ResponsiveContainer width="100%" height={180}>
+        <ResponsiveContainer width="100%" height={200}>
           <BarChart
             data={data}
-            barSize={20}
-            margin={{ top: 10, right: 8, left: 0, bottom: 30 }}
+            barSize={28}
+            margin={{ top: 20, right: 8, left: 0, bottom: 30 }}
           >
             <CartesianGrid
               strokeDasharray="3 3"
@@ -517,26 +541,39 @@ export default function QuanLySinhVien() {
               tickMargin={4}
               padding={{ left: 10, right: 10 }}
             />
-            <YAxis tick={{ fontSize: 10, fill: "#64748b" }} />
+            <YAxis tick={{ fontSize: 10, fill: "#64748b" }} allowDecimals={false} />
             <Tooltip
               cursor={{ fill: "rgba(37,99,235,0.08)" }}
               contentStyle={{ borderRadius: 12, border: "1px solid #e2e8f0" }}
+              formatter={(value) => [`${value} sinh viên`, "Số lượng"]}
             />
-            {/* Gán màu cho từng cột dựa vào hàm getBarColor ở trên */}
             <Bar dataKey="value" radius={[6, 6, 0, 0]}>
-              {data.map((entry, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={getBarColor(entry.name, getColor(colorIndex))}
-                />
-              ))}
+              {data.map((entry, index) => {
+                // Biểu đồ 2 cột: dùng 2 màu khác nhau khi keyword không khớp
+                const twoColColors = ["#2563eb", "#f97316"]; // xanh dương & cam
+                const fallback = data.length === 2
+                  ? twoColColors[index]
+                  : getColor(colorIndex);
+                return (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={getBarColor(entry.name, fallback)}
+                  />
+                );
+              })}
+              <LabelList
+                dataKey="value"
+                position="top"
+                offset={6}
+                style={{ fill: "#0f172a", fontSize: 11, fontWeight: 700 }}
+              />
             </Bar>
           </BarChart>
         </ResponsiveContainer>
-        <div style={{ marginTop: 10, fontSize: 11, color: "#64748b" }}>
+        <div style={{ marginTop: 8, fontSize: 11, color: "#64748b" }}>
           {data.length === 0
             ? "Không có dữ liệu hiển thị"
-            : "Di chuột để xem chi tiết từng cột."}
+            : "Số lượng sinh viên theo phân loại. Di chuột để xem chi tiết."}
         </div>
       </div>
     );
@@ -882,7 +919,7 @@ export default function QuanLySinhVien() {
                 marginBottom: 12,
               }}
             >
-              📊 11 thuộc tính
+              📊 13 thuộc tính
             </div>
             <div
               style={{
@@ -897,6 +934,7 @@ export default function QuanLySinhVien() {
                   title={item.title}
                   data={item.data}
                   colorIndex={item.colorIndex}
+                  invertColor={item.invertColor}
                 />
               ))}
             </div>
@@ -1227,10 +1265,10 @@ export default function QuanLySinhVien() {
               </div>
             </div>
 
-            {/* 11 indicators */}
+            {/* 13 indicators */}
             <div style={{ marginBottom: 16 }}>
               <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10 }}>
-                📊 Phân tích 11 chỉ số AI
+                📊 Phân tích 13 chỉ số AI
               </div>
               <div
                 style={{
@@ -1259,7 +1297,7 @@ export default function QuanLySinhVien() {
             </div>
 
             {/* Reasons */}
-            {selected.reasons && (
+            {selected.warning_reasons && selected.warning_reasons.length > 0 && (
               <div style={{ marginBottom: 16 }}>
                 <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>
                   🚩 Lý do cảnh báo
@@ -1267,9 +1305,9 @@ export default function QuanLySinhVien() {
                 {(() => {
                   try {
                     const list =
-                      typeof selected.reasons === "string"
-                        ? JSON.parse(selected.reasons)
-                        : selected.reasons;
+                      typeof selected.warning_reasons === "string"
+                        ? JSON.parse(selected.warning_reasons)
+                        : selected.warning_reasons;
                     const unique = [
                       ...new Set(Array.isArray(list) ? list : [list]),
                     ];

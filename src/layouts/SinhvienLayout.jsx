@@ -1,8 +1,9 @@
-import { Outlet, NavLink, useNavigate } from "react-router-dom";
+import { Outlet, NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import {
-  MdPerson, MdWarning, MdLogout, MdShield,
-  MdRoute, MdQuiz, MdTrendingUp, MdLock, MdAutoAwesome, MdFingerprint
+  MdPerson, MdWarning, MdLogout, MdSettings,
+  MdRoute, MdQuiz, MdTrendingUp, MdAutoAwesome,
+  MdSearch, MdNotificationsNone, MdLock
 } from "react-icons/md";
 
 function getInitials(name) {
@@ -10,19 +11,19 @@ function getInitials(name) {
   return name.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
 }
 
-const NAV_LINKS = [
-  { to: "/sinhvien/thong-tin", icon: <MdPerson size={18} />, label: "THÔNG TIN CÁ NHÂN" },
-  { to: "/sinhvien/rui-ro", icon: <MdWarning size={18} />, label: "RỦI RO HỌC TẬP" },
-  { to: "/sinhvien/lo-trinh", icon: <MdRoute size={18} />, label: "LỘ TRÌNH HỌC TẬP" },
-  { to: "/sinhvien/bai-tap", icon: <MdQuiz size={18} />, label: "BÀI TẬP & TEST" },
-  { to: "/sinhvien/bai-tap-ai", icon: <MdAutoAwesome size={18} />, label: "BÀI TẬP AI" },
-  { to: "/sinhvien/tien-bo", icon: <MdTrendingUp size={18} />, label: "TIẾN BỘ CỦA TÔI" },
-  { to: "/sinhvien/doi-mat-khau", icon: <MdLock size={18} />, label: "ĐỔI MẬT KHẨU" },
+const SIDEBAR_LINKS = [
+  { to: "/sinhvien/thong-tin", icon: <MdPerson size={20} />, label: "Thông tin cá nhân" },
+  { to: "/sinhvien/rui-ro", icon: <MdWarning size={20} />, label: "Rủi ro học tập" },
+  { to: "/sinhvien/lo-trinh", icon: <MdRoute size={20} />, label: "Lộ trình học tập" },
+  { to: "/sinhvien/bai-tap", icon: <MdQuiz size={20} />, label: "Bài test tâm lý và kỹ năng mềm" },
+  { to: "/sinhvien/bai-tap-ai", icon: <MdAutoAwesome size={20} />, label: "Bài tập ôn lại kiến thức" },
+  { to: "/sinhvien/tien-bo", icon: <MdTrendingUp size={20} />, label: "Tiến bộ của tôi" },
 ];
 
 export default function SinhvienLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = () => {
     logout();
@@ -30,40 +31,27 @@ export default function SinhvienLayout() {
   };
 
   return (
-    <div className="cyber-theme cyber-layout">
+    <div className="uni-layout">
       {/* ── Sidebar ──────────────────────────────────── */}
-      <aside className="cyber-sidebar">
-        <div className="cyber-sidebar-header">
-          <div className="cyber-logo-text">CORE_PORTAL_V1</div>
+      <aside className="uni-sidebar">
+        <div className="uni-sidebar-header">
+          <div className="uni-logo-text">Cảnh báo rớt môn</div>
         </div>
 
-        <div style={{ padding: "24px 20px 10px" }}>
-          <div style={{ 
-            background: "rgba(0, 240, 255, 0.05)", 
-            border: "1px solid var(--cyber-accent)", 
-            borderRadius: 8, 
-            padding: "16px",
-            display: "flex", alignItems: "center", gap: 14
-          }}>
-            <div className="cyber-avatar">
-              <MdFingerprint size={24} />
-            </div>
-            <div>
-              <div style={{ fontSize: 10, color: "var(--cyber-accent)", letterSpacing: 1 }}>ID: STUDENT_ID_{user?.linked_id || "000"}</div>
-              <div style={{ fontSize: 10, color: "var(--cyber-success)", display: "flex", alignItems: "center", gap: 6, marginTop: 4 }}>
-                <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--cyber-success)", boxShadow: "var(--cyber-success-glow)" }}></span>
-                Status: Online
-              </div>
-            </div>
+        <div className="uni-sidebar-profile">
+          <img src={`https://ui-avatars.com/api/?name=${user?.display_name || 'Sinh viên'}&background=random`} alt="Ảnh đại diện" />
+          <div>
+            <div style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>{user?.display_name || "Học viên"}</div>
+            <div style={{ fontSize: 12, color: "#9ca3af" }}>MSSV: {user?.linked_id || "Chưa có"}</div>
           </div>
         </div>
 
-        <nav className="cyber-nav">
-          {NAV_LINKS.map(link => (
+        <nav className="uni-nav">
+          {SIDEBAR_LINKS.map(link => (
             <NavLink
               key={link.to}
               to={link.to}
-              className={({ isActive }) => `cyber-nav-item ${isActive ? "active" : ""}`}
+              className={({ isActive }) => `uni-nav-item ${isActive ? "active" : ""}`}
             >
               {link.icon}
               {link.label}
@@ -71,42 +59,37 @@ export default function SinhvienLayout() {
           ))}
         </nav>
 
-        <div style={{ padding: "20px", borderTop: "1px solid var(--cyber-border)" }}>
-          <div style={{ fontSize: 10, color: "var(--cyber-text-muted)", marginBottom: 8, letterSpacing: 1 }}>SYSTEM LOAD: 24%</div>
-          <div style={{ height: 4, background: "rgba(255,255,255,0.1)", borderRadius: 2, overflow: "hidden" }}>
-            <div style={{ width: "24%", height: "100%", background: "var(--cyber-accent)", boxShadow: "var(--cyber-accent-glow)" }}></div>
-          </div>
+        <div className="uni-sidebar-footer">
+          <NavLink to="/sinhvien/doi-mat-khau" className="uni-sidebar-footer-link">
+            <MdLock size={18} /> Đổi mật khẩu
+          </NavLink>
+          <button 
+            className="uni-sidebar-footer-link" 
+            onClick={handleLogout}
+            style={{ background: 'transparent', border: 'none', width: '100%', textAlign: 'left', cursor: 'pointer', color: '#fca5a5' }}
+          >
+            <MdLogout size={18} /> Đăng xuất
+          </button>
         </div>
       </aside>
 
       {/* ── Main Content ─────────────────────────────── */}
-      <div className="cyber-main">
-        <header className="cyber-topbar">
-          <div style={{ display: "flex", gap: 32 }}>
-            {["DASHBOARD", "ANALYTICS", "RESOURCES"].map((item, i) => (
-              <div key={item} style={{ 
-                color: i === 0 ? "var(--cyber-accent)" : "var(--cyber-text-muted)",
-                fontSize: 12, fontWeight: 700, letterSpacing: 2, cursor: "pointer",
-                borderBottom: i === 0 ? "2px solid var(--cyber-accent)" : "none",
-                paddingBottom: 6, paddingTop: 6
-              }}>
-                {item}
-              </div>
-            ))}
+      <div className="uni-main">
+        <header className="uni-topbar">
+          <div className="uni-topbar-nav">
+            {/* Topbar links removed - real links are in sidebar */}
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-            <button className="cyber-btn" onClick={handleLogout} style={{ padding: "6px 14px", fontSize: 10 }}>
-              <MdLogout size={14} style={{ marginRight: 6, verticalAlign: "middle" }} />
-              LOGOUT
-            </button>
-            <div className="cyber-avatar" style={{ width: 32, height: 32, borderRadius: "50%" }}>
-              {getInitials(user?.display_name || user?.username)}
-            </div>
+          <div className="uni-topbar-right">
+            <img 
+              src={`https://ui-avatars.com/api/?name=${user?.display_name || 'Sinh viên'}&background=0D8ABC&color=fff`} 
+              alt="Ảnh đại diện" 
+              style={{ width: 32, height: 32, borderRadius: "50%", cursor: "pointer" }}
+            />
           </div>
         </header>
 
-        <main className="cyber-content">
+        <main className="uni-content">
           <Outlet />
         </main>
       </div>

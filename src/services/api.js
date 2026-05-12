@@ -93,10 +93,16 @@ export const getTamLyRandom = (mssv) =>
 export const submitTamLy = (mssv, answers) =>
   api.post("/api/v2/tam-ly/submit", { mssv, answers });
 
+export const getTamLyStats = (mssv) =>
+  api.get(`/api/v2/tam-ly/stats/${mssv}`);
+
 
 // ── Tiến bộ & So sánh ─────────────────────────────────
 export const getProgress = (mssv) =>
   api.get(`/api/v2/progress/${mssv}`);
+
+export const getExerciseHistory = (mssv) =>
+  api.get(`/api/v2/exercises/history/${mssv}`);
 
 // ── Deprecated/Compatibility functions cho QuanLySinhVien ──────────────
 export const generateAdvice = () => Promise.resolve({ data: { advice: "" } });

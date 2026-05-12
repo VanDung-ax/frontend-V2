@@ -2,7 +2,7 @@ import { Outlet, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import {
   MdDashboard, MdSchool, MdManageAccounts,
-  MdCloudUpload, MdLogout, MdNotifications, MdShield
+  MdCloudUpload, MdLogout, MdShield
 } from "react-icons/md";
 
 const navItems = [
@@ -69,7 +69,7 @@ export default function AdminLayout() {
         <header className="topbar">
           <div className="topbar-left" />
           <div className="topbar-right">
-            <button className="icon-btn"><MdNotifications /></button>
+
             <div className="topbar-user">
               <div style={{ textAlign: "right" }}>
                 <div className="user-name">{user?.display_name || user?.username}</div>

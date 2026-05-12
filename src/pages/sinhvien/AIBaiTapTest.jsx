@@ -11,29 +11,27 @@ const OPTION_LABELS = ["A", "B", "C", "D"];
 const customStyles = `
   .quiz-option {
     transition: all 0.2s ease;
-    background: rgba(0, 240, 255, 0.05);
-    border: 1px solid var(--cyber-border);
-    color: var(--cyber-text);
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    color: #334155;
   }
   .quiz-option:not(:disabled):hover {
     transform: translateX(4px);
-    box-shadow: inset 0 0 10px rgba(0, 240, 255, 0.1);
-    border-color: var(--cyber-accent);
+    border-color: #3b82f6;
+    background: #f8fafc;
   }
   .quiz-option.selected {
-    background: rgba(0, 240, 255, 0.1);
-    border-color: var(--cyber-accent);
-    box-shadow: var(--cyber-accent-glow);
+    background: #eff6ff;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 1px #3b82f6;
   }
   .quiz-option.correct {
-    background: rgba(0, 255, 157, 0.1) !important;
-    border-color: var(--cyber-success) !important;
-    box-shadow: var(--cyber-success-glow) !important;
+    background: #f0fdf4 !important;
+    border-color: #10b981 !important;
   }
   .quiz-option.wrong {
-    background: rgba(255, 0, 85, 0.1) !important;
-    border-color: var(--cyber-danger) !important;
-    box-shadow: inset 0 0 10px rgba(255, 0, 85, 0.2) !important;
+    background: #fef2f2 !important;
+    border-color: #ef4444 !important;
   }
 `;
 
@@ -42,25 +40,25 @@ function AIQuizCard({ question, index, onSelect, selectedIdx, result }) {
   const correctIdx = options.indexOf(question.lua_chon_dung);
   
   return (
-    <div className="cyber-card" style={{ padding: 0, marginBottom: 20, overflow: "hidden" }}>
-      <div style={{ padding: "20px 24px", borderBottom: "1px solid var(--cyber-border)", background: "rgba(0, 240, 255, 0.02)" }}>
-        <div style={{ fontSize: 11, fontFamily: 'var(--font-mono)', color: "var(--cyber-accent)", marginBottom: 6, textTransform: "uppercase", letterSpacing: 1 }}>
-          SEQ_{index + 1}
+    <div className="uni-card" style={{ padding: 0, marginBottom: 24, overflow: "hidden" }}>
+      <div style={{ padding: "20px 24px", borderBottom: "1px solid #e2e8f0", background: "#f8fafc" }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: "#3b82f6", marginBottom: 8, textTransform: "uppercase", letterSpacing: 0.5 }}>
+          Câu hỏi {index + 1}
         </div>
-        <p style={{ margin: 0, fontFamily: 'var(--font-display)', fontSize: 16, color: "var(--cyber-text)", lineHeight: 1.5 }}>
+        <p style={{ margin: 0, fontSize: 16, fontWeight: 600, color: "#1e293b", lineHeight: 1.6 }}>
           {question.cau_hoi}
         </p>
       </div>
 
-      <div style={{ padding: "16px 20px", display: "flex", flexDirection: "column", gap: 10 }}>
+      <div style={{ padding: "20px 24px", display: "flex", flexDirection: "column", gap: 12 }}>
         {options.map((opt, idx) => {
           let extraClass = "";
-          let iconColor = "var(--cyber-text-muted)";
+          let iconColor = "#94a3b8";
           
           if (result) {
-            if (idx === correctIdx) { extraClass = "correct"; iconColor = "var(--cyber-success)"; }
-            else if (idx === selectedIdx && idx !== correctIdx) { extraClass = "wrong"; iconColor = "var(--cyber-danger)"; }
-          } else if (selectedIdx === idx) { extraClass = "selected"; iconColor = "var(--cyber-accent)"; }
+            if (idx === correctIdx) { extraClass = "correct"; iconColor = "#10b981"; }
+            else if (idx === selectedIdx && idx !== correctIdx) { extraClass = "wrong"; iconColor = "#ef4444"; }
+          } else if (selectedIdx === idx) { extraClass = "selected"; iconColor = "#3b82f6"; }
 
           return (
             <button
@@ -70,40 +68,39 @@ function AIQuizCard({ question, index, onSelect, selectedIdx, result }) {
               onClick={() => onSelect(index, idx)}
               style={{
                 width: "100%", textAlign: "left",
-                borderRadius: 4, padding: "12px 16px", cursor: result ? "default" : "pointer",
-                display: "flex", alignItems: "center", gap: 12
+                borderRadius: 8, padding: "14px 16px", cursor: result ? "default" : "pointer",
+                display: "flex", alignItems: "center", gap: 16
               }}
             >
               <span style={{
-                width: 24, height: 24,
-                border: `1px solid ${iconColor}`,
-                color: iconColor,
+                width: 28, height: 28, borderRadius: "50%",
+                border: `2px solid ${iconColor}`,
+                color: iconColor, fontWeight: 700,
                 display: "flex", alignItems: "center", justifyContent: "center",
-                fontFamily: 'var(--font-mono)', fontSize: 12, flexShrink: 0,
-                boxShadow: extraClass ? `0 0 8px ${iconColor}` : 'none'
+                fontSize: 14, flexShrink: 0
               }}>
                 {OPTION_LABELS[idx]}
               </span>
-              <span style={{ fontSize: 14, fontFamily: 'var(--font-mono)', flex: 1 }}>{opt}</span>
+              <span style={{ fontSize: 15, flex: 1, color: "#334155" }}>{opt}</span>
             </button>
           );
         })}
 
         {result && (
           <div style={{
-            marginTop: 8, padding: "14px 16px", borderRadius: 4,
-            background: result.is_correct ? "rgba(0, 255, 157, 0.05)" : "rgba(255, 183, 3, 0.05)",
-            border: `1px solid ${result.is_correct ? "var(--cyber-success)" : "var(--cyber-warning)"}`,
-            display: "flex", gap: 10, alignItems: "flex-start"
+            marginTop: 12, padding: "16px", borderRadius: 8,
+            background: result.is_correct ? "#f0fdf4" : "#fffbeb",
+            border: `1px solid ${result.is_correct ? "#bbf7d0" : "#fde68a"}`,
+            display: "flex", gap: 12, alignItems: "flex-start"
           }}>
             {result.is_correct
-              ? <MdCheckCircle size={20} color="var(--cyber-success)" style={{ flexShrink: 0, marginTop: 1 }} />
-              : <MdTrendingDown size={20} color="var(--cyber-warning)" style={{ flexShrink: 0, marginTop: 1 }} />}
+              ? <MdCheckCircle size={24} color="#16a34a" style={{ flexShrink: 0 }} />
+              : <MdTrendingDown size={24} color="#d97706" style={{ flexShrink: 0 }} />}
             <div>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: 13, color: result.is_correct ? "var(--cyber-success)" : "var(--cyber-warning)", marginBottom: 4 }}>
-                {result.is_correct ? "MATCH_FOUND_CORRECT" : "ANOMALY_DETECTED // EXPLANATION:"}
+              <div style={{ fontSize: 15, fontWeight: 700, color: result.is_correct ? "#15803d" : "#b45309", marginBottom: 6 }}>
+                {result.is_correct ? "Đáp án chính xác" : "Đáp án chưa chính xác // Lời giải:"}
               </div>
-              <div style={{ fontSize: 13, color: "var(--cyber-text-muted)", lineHeight: 1.6, fontFamily: 'var(--font-mono)' }}>
+              <div style={{ fontSize: 14, color: "#475569", lineHeight: 1.6 }}>
                 {question.giai_thich}
               </div>
             </div>
@@ -164,7 +161,6 @@ export default function AIBaiTapTest() {
         if (history.length > 0) {
           const latest = history[history.length - 1];
           
-          // Ưu tiên lấy tên môn học thực tế từ bảng môn học
           if (latest.ten_mon_hoc) {
             setMonHoc(latest.ten_mon_hoc);
           }
@@ -212,10 +208,10 @@ export default function AIBaiTapTest() {
         setStep('playing');
       } else {
         console.error("Lỗi dữ liệu AI trả về:", res.data);
-        alert("AI đang bị quá tải hoặc trả về sai định dạng. Vui lòng bấm thử lại!\nDữ liệu nhận được: " + JSON.stringify(res.data).substring(0, 100));
+        alert("Hệ thống AI đang bận. Vui lòng thử lại!\nDữ liệu nhận được: " + JSON.stringify(res.data).substring(0, 100));
       }
     } catch (e) {
-      alert("Lỗi khi gọi AI API: " + (e.response?.data?.detail || e.message));
+      alert("Lỗi: " + (e.response?.data?.detail || e.message));
     } finally {
       setLoadingAI(false);
     }
@@ -258,67 +254,38 @@ export default function AIBaiTapTest() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleRepredict = async () => {
-    setRepredicting(true);
-    try {
-      const res = await repredictStudent(mssv, { ...repredForm, parent_result_id: null });
-      setRepredResult(res.data);
-    } catch (e) {
-      alert("Lỗi dự báo lại: " + (e.response?.data?.detail || e.message));
-    } finally {
-      setRepredicting(false);
-    }
-  };
-
-  const NUMERIC_FIELDS = [
-    { key: "thoi_gian_tu_hoc", label: "Giờ tự học/tuần", min: 0, max: 40 },
-    { key: "chuyen_can", label: "Chuyên cần (%)", min: 0, max: 100 },
-    { key: "diem_qua_trinh", label: "Điểm quá trình (0-10)", min: 0, max: 10 },
-    { key: "hoan_thanh_bai_tap", label: "Hoàn thành bài tập (%)", min: 0, max: 100 },
-    { key: "tre_hoc", label: "Số lần trễ học", min: 0, max: 30 }
-  ];
-  
-  const YESNO_FIELDS = [
-    { key: "loai_mon_hoc", label: "Loại môn học", options: ["Đại cương", "Chuyên ngành", "Thực hành", "Tự chọn"] },
-    { key: "tai_lieu_on_tap", label: "Có tài liệu ôn tập", options: ["Có", "Không"] },
-    { key: "hinh_thuc_thi", label: "Hình thức thi", options: ["Tự luận", "Trắc nghiệm", "Thực hành", "Vấn đáp"] },
-    { key: "tre_hoc_phi", label: "Trễ học phí", options: ["Có", "Không"] },
-    { key: "ho_tro", label: "Có hỗ trợ học tập", options: ["Có", "Không"] },
-    { key: "hoc_nhom", label: "Học nhóm", options: ["Có", "Không"] }
-  ];
-
   return (
-    <div style={{ paddingBottom: 48, maxWidth: 760, margin: "0 auto" }}>
+    <div style={{ paddingBottom: 48, maxWidth: 860, margin: "0 auto", paddingTop: 16 }}>
       <style>{customStyles}</style>
-      <div style={{ marginBottom: 32, textAlign: "center", paddingTop: 16 }}>
-        <h1 style={{ fontSize: 28, fontFamily: 'var(--font-display)', color: "var(--cyber-accent)", textShadow: "var(--cyber-accent-glow)", marginBottom: 8, display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
-          <MdAutoAwesome /> NEURAL_TRAINING_GROUND
+      <div style={{ marginBottom: 36, textAlign: "center" }}>
+        <h1 style={{ fontSize: 28, fontWeight: 800, color: '#1e293b', marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
+          <MdAutoAwesome color="#2563eb" /> Bài tập rèn luyện AI
         </h1>
-        <p style={{ color: "var(--cyber-text-muted)", fontSize: 14, fontFamily: 'var(--font-mono)' }}>
-          AI-driven knowledge patching sequence. Score &gt; 75% to trigger risk parameter reset.
+        <p style={{ color: "#64748b", fontSize: 15, margin: 0 }}>
+          Hệ thống sẽ tự động tạo các bài tập luyện tập tùy chỉnh. Cố gắng đạt trên 75% để cải thiện chỉ số đánh giá.
         </p>
       </div>
 
       {step === 'setup' && (
-        <div className="cyber-card" style={{ padding: "48px 32px", border: "1px solid var(--cyber-accent)", boxShadow: "inset 0 0 50px rgba(0, 240, 255, 0.05)", textAlign: "center" }}>
-          <div style={{ marginBottom: 32 }}>
-            <div style={{ fontSize: 64, marginBottom: 16, textShadow: "var(--cyber-accent-glow)" }}>🚀</div>
-            <h2 style={{ fontSize: 24, fontFamily: 'var(--font-display)', color: "var(--cyber-text)", marginBottom: 16 }}>READY_FOR_CALIBRATION?</h2>
-            <p style={{ color: "var(--cyber-text-muted)", fontSize: 14, maxWidth: 560, margin: "0 auto", lineHeight: 1.6, fontFamily: 'var(--font-mono)' }}>
-              Core system will generate localized testing protocols for <strong>{monHoc || "chuyên ngành"}</strong> to address detected anomalies. Progression will be logged.
+        <div className="uni-card" style={{ padding: "48px 32px", border: "1px solid #bfdbfe", background: "#f8fafc", textAlign: "center" }}>
+          <div style={{ marginBottom: 36 }}>
+            <div style={{ fontSize: 64, marginBottom: 24 }}>🚀</div>
+            <h2 style={{ fontSize: 24, fontWeight: 700, color: "#1e293b", marginBottom: 16 }}>Bạn đã sẵn sàng làm bài?</h2>
+            <p style={{ color: "#475569", fontSize: 15, maxWidth: 560, margin: "0 auto", lineHeight: 1.6 }}>
+              Hệ thống AI sẽ sinh ra các bài trắc nghiệm dành riêng cho <strong>{monHoc || "chuyên ngành của bạn"}</strong> để bổ sung phần kiến thức còn thiếu sót. Kết quả sẽ được lưu lại.
             </p>
           </div>
           <button 
             onClick={handleGenerate} 
             disabled={loadingAI}
-            className="cyber-btn cyber-btn-primary"
+            className="uni-btn"
             style={{ 
-              padding: "18px 40px", 
+              padding: "16px 40px", 
               fontSize: 16, cursor: loadingAI ? "not-allowed" : "pointer",
-              display: "inline-flex", alignItems: "center", gap: 12
+              display: "inline-flex", alignItems: "center", gap: 10
             }}
           >
-            {loadingAI ? <div className="spinner" style={{width:24, height:24, borderColor: 'var(--cyber-bg)', borderTopColor: 'transparent'}}/> : <><MdAutoAwesome size={24} /> INITIALIZE_TRAINING_MODULE</>}
+            {loadingAI ? <div className="spinner" style={{width: 24, height: 24, borderWidth: 2, borderColor: '#fff', borderTopColor: 'transparent'}}/> : <><MdAutoAwesome size={24} /> Tạo bài tập tự động</>}
           </button>
         </div>
       )}
@@ -326,34 +293,36 @@ export default function AIBaiTapTest() {
       {(step === 'playing' || step === 'result') && (
         <div>
           {step === 'result' && (
-            <div className="cyber-card" style={{
-              background: score >= 75 ? "rgba(0, 255, 157, 0.05)" : "rgba(255, 183, 3, 0.05)",
-              border: `1px solid ${score >= 75 ? "var(--cyber-success)" : "var(--cyber-warning)"}`,
-              padding: "32px", marginBottom: 24, textAlign: "center",
-              boxShadow: score >= 75 ? "inset 0 0 30px rgba(0, 255, 157, 0.1)" : "inset 0 0 30px rgba(255, 183, 3, 0.1)"
+            <div className="uni-card" style={{
+              background: score >= 75 ? "#f0fdf4" : "#fffbeb",
+              border: `1px solid ${score >= 75 ? "#bbf7d0" : "#fde68a"}`,
+              padding: "32px", marginBottom: 32, textAlign: "center"
             }}>
-              <div style={{ fontSize: 48, fontFamily: 'var(--font-display)', color: score >= 75 ? "var(--cyber-success)" : "var(--cyber-warning)", marginBottom: 8, textShadow: score >= 75 ? "var(--cyber-success-glow)" : "none" }}>{score}%</div>
-              <div style={{ fontSize: 16, fontFamily: 'var(--font-mono)', color: "var(--cyber-text)" }}>
-                {score >= 75 ? "STATUS: CALIBRATION_COMPLETE // Ready for parameter override." : "STATUS: SUB_OPTIMAL // Threshold 75% required."}
+              <div style={{ fontSize: 56, fontWeight: 800, color: score >= 75 ? "#16a34a" : "#d97706", marginBottom: 8 }}>{score}%</div>
+              <div style={{ fontSize: 18, fontWeight: 700, color: "#1e293b", marginBottom: 8 }}>
+                {score >= 75 ? "Vượt qua thử thách!" : "Chưa đạt yêu cầu (Cần >= 75%)"}
+              </div>
+              <div style={{ fontSize: 15, color: "#475569" }}>
+                {score >= 75 ? "Xin chúc mừng, hệ thống đã ghi nhận điểm số của bạn để tiến hành đánh giá lại." : "Bạn nên xem lại lý thuyết và làm lại bài kiểm tra khác."}
               </div>
               <button 
                 onClick={() => setStep('setup')}
-                className="cyber-btn"
-                style={{ marginTop: 16 }}
+                className="uni-btn-outline"
+                style={{ marginTop: 24 }}
               >
-                REQUEST_NEW_MODULE
+                Làm bài tập khác
               </button>
             </div>
           )}
 
           {step === 'result' && score >= 75 && (
-            <div className="cyber-card" style={{ background: "rgba(0, 255, 157, 0.05)", border: "1px solid var(--cyber-success)", padding: 32, marginBottom: 24, boxShadow: "inset 0 0 20px rgba(0, 255, 157, 0.1)", textAlign: "center" }}>
-              <div style={{ fontSize: 48, marginBottom: 16, textShadow: "var(--cyber-success-glow)" }}>🎉</div>
-              <h3 style={{ margin: "0 0 12px", fontSize: 20, fontFamily: 'var(--font-display)', color: "var(--cyber-success)" }}>
-                PROGRESSION_LOGGED
+            <div className="uni-card" style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", padding: 32, marginBottom: 32, textAlign: "center" }}>
+              <div style={{ fontSize: 48, marginBottom: 16 }}>🎉</div>
+              <h3 style={{ margin: "0 0 12px", fontSize: 20, fontWeight: 700, color: "#15803d" }}>
+                Ghi nhận tiến bộ
               </h3>
-              <p style={{ color: "var(--cyber-success)", margin: 0, fontSize: 14, fontFamily: 'var(--font-mono)' }}>
-                System recorded positive vector changes. Academic trajectory updated.
+              <p style={{ color: "#16a34a", margin: 0, fontSize: 15, fontWeight: 600 }}>
+                Hệ thống đã lưu lại kết quả và đánh dấu cải thiện. Lần dự báo tiếp theo của bạn sẽ có kết quả khả quan hơn!
               </p>
             </div>
           )}
@@ -380,16 +349,16 @@ export default function AIBaiTapTest() {
           </div>
 
           {!graded && questions.length > 0 && (
-            <div className="cyber-card" style={{ marginTop: 24, textAlign: "center" }}>
-              <h3 style={{ margin: "0 0 16px", fontSize: 18, fontFamily: 'var(--font-display)', color: "var(--cyber-text)" }}>MODULE_COMPLETE?</h3>
-              <p style={{ color: "var(--cyber-text-muted)", marginBottom: 24, fontSize: 13, fontFamily: 'var(--font-mono)' }}>Submit data for evaluation.</p>
+            <div className="uni-card" style={{ marginTop: 32, padding: 32, textAlign: "center" }}>
+              <h3 style={{ margin: "0 0 12px", fontSize: 20, fontWeight: 700, color: "#1e293b" }}>Hoàn tất làm bài?</h3>
+              <p style={{ color: "#64748b", marginBottom: 24, fontSize: 15 }}>Chắc chắn bạn đã chọn tất cả các đáp án trước khi nộp.</p>
               <button 
                 onClick={handleGrade}
-                className="cyber-btn cyber-btn-primary"
-                style={{ padding: "16px 40px", display: "inline-flex", alignItems: "center" }}
+                className="uni-btn"
+                style={{ padding: "16px 48px", display: "inline-flex", alignItems: "center", gap: 10, fontSize: 16 }}
               >
-                <MdCheckCircle style={{ marginRight: 8 }} size={20} />
-                SUBMIT_MODULE
+                <MdCheckCircle size={24} />
+                Nộp bài
               </button>
             </div>
           )}

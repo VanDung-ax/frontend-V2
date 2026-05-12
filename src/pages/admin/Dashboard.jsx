@@ -6,7 +6,7 @@ import {
   getAllResults,
 } from "../../services/api";
 import { MdPeople, MdWarning, MdTrendingUp, MdAnalytics } from "react-icons/md";
-import anh1 from "./anh1.png";
+import anh2 from "./anh2.jpg";
 
 function getRiskClass(score) {
   if (score >= 0.8) return "risk-high";
@@ -105,7 +105,6 @@ export default function Dashboard() {
           <div className="metric-value">
             {stats.total_sinhvien?.toLocaleString()}
           </div>
-          <div className="metric-sub">+2.4% so với kỳ trước</div>
           <div className="metric-icon">
             <MdPeople />
           </div>
@@ -136,7 +135,6 @@ export default function Dashboard() {
         <div className="metric-card dark">
           <div className="metric-label">Điểm rủi ro TB</div>
           <div className="metric-value">{avgScore}</div>
-          <div className="metric-sub">Ngưỡng an toàn: &lt; 30.0</div>
           <div className="metric-icon">
             <MdAnalytics />
           </div>
@@ -155,8 +153,8 @@ export default function Dashboard() {
         </div>
         <div style={{ textAlign: "center", marginTop: 16 }}>
           <img
-            src={anh1}
-            alt="anh1"
+            src={anh2}
+            alt="anh2"
             style={{
               maxWidth: "100%",
               height: "auto",

@@ -28,29 +28,31 @@ const parseToBlocks = (text) => {
 const MindMapBoxes = ({ text, type }) => {
   const blocks = parseToBlocks(text);
   if (blocks.length === 0) return null;
-  if (blocks.length === 1) return <div style={{ lineHeight: 1.6, color: 'var(--cyber-text)' }}>{blocks[0]}</div>;
+  if (blocks.length === 1) return <div style={{ lineHeight: 1.6, color: '#475569' }}>{blocks[0]}</div>;
 
-  const colorVar = type === 'warning' ? 'var(--cyber-warning)' : type === 'primary' ? 'var(--cyber-accent)' : 'var(--cyber-success)';
+  const borderColor = type === 'warning' ? '#fde68a' : type === 'primary' ? '#bfdbfe' : '#bbf7d0';
+  const leftColor = type === 'warning' ? '#f59e0b' : type === 'primary' ? '#3b82f6' : '#10b981';
+  const bgColor = type === 'warning' ? '#fffbeb' : type === 'primary' ? '#eff6ff' : '#f0fdf4';
 
   return (
     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 16, marginTop: 16 }}>
       {blocks.map((b, i) => (
         <div key={i} style={{
-          background: `rgba(0, 0, 0, 0.2)`, 
-          border: `1px solid rgba(255,255,255,0.1)`,
-          borderLeft: `3px solid ${colorVar}`,
+          background: bgColor, 
+          border: `1px solid ${borderColor}`,
+          borderLeft: `4px solid ${leftColor}`,
           padding: 16,
-          fontFamily: 'var(--font-mono)',
-          fontSize: 13,
-          color: "var(--cyber-text-muted)",
-          lineHeight: 1.5,
+          borderRadius: 8,
+          fontSize: 14,
+          color: "#334155",
+          lineHeight: 1.6,
           position: "relative",
           overflow: "hidden"
         }}>
-          <div style={{ position: "absolute", top: 0, right: 0, fontSize: 10, padding: "2px 6px", background: "rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.5)" }}>
-            SEQ_{i+1}
+          <div style={{ position: "absolute", top: 4, right: 8, fontSize: 11, fontWeight: 700, color: leftColor, opacity: 0.7 }}>
+            Bước {i+1}
           </div>
-          {b}
+          <div style={{ marginTop: 8 }}>{b}</div>
         </div>
       ))}
     </div>
@@ -81,20 +83,18 @@ export default function LoTrinhHocTap() {
         if (studentRes.data?.Nganh) setNganh(studentRes.data.Nganh);
         else setNganh("Chưa cập nhật ngành");
 
-        // Thử lấy lộ trình đã lưu
         try {
           const savedRes = await getSavedAIRoadmap(mssv);
           if (savedRes.data) {
             setMonHoc(savedRes.data.mon_hoc || "");
             setLyDo(savedRes.data.ly_do_rot || "");
             setRoadmapData(savedRes.data);
-            return; // Đã có lộ trình thì dừng
+            return;
           }
         } catch (e) {
           console.log("Không có lộ trình cũ", e);
         }
 
-        // Nếu chưa có lộ trình, lấy dữ liệu gợi ý từ dự báo
         const progressRes = await getProgress(mssv);
         if (progressRes.data?.history?.length > 0) {
           const latest = progressRes.data.history[progressRes.data.history.length - 1];
@@ -143,113 +143,111 @@ export default function LoTrinhHocTap() {
     setLyDo("");
   };
 
+  if (dataLoading) return <div style={{ padding: 40, textAlign: 'center' }}>Đang tải dữ liệu...</div>;
+
   return (
     <div style={{ maxWidth: 900, margin: "0 auto", paddingBottom: 60 }}>
       <style>{`
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .roadmap-container { position: relative; padding-left: 40px; margin-top: 40px; }
+        .roadmap-container { position: relative; padding-left: 32px; margin-top: 32px; }
         .roadmap-container::before {
           content: ""; position: absolute; left: 15px; top: 0; bottom: 0;
-          width: 2px; background: rgba(0, 240, 255, 0.3);
-          box-shadow: var(--cyber-accent-glow);
+          width: 2px; background: #e2e8f0;
         }
         .roadmap-node {
-          position: relative; margin-bottom: 40px;
+          position: relative; margin-bottom: 32px;
           animation: fadeIn 0.6s ease both;
-          background: var(--cyber-card); padding: 24px; border-radius: 4px;
-          box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-          border: 1px solid var(--cyber-border);
+          background: #fff; padding: 24px; border-radius: 8px;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+          border: 1px solid #e2e8f0;
         }
         .roadmap-node::before {
-          content: ""; position: absolute; left: -34px; top: 24px;
+          content: ""; position: absolute; left: -26px; top: 24px;
           width: 16px; height: 16px; border-radius: 50%;
-          background: var(--cyber-bg); border: 2px solid var(--cyber-accent);
-          box-shadow: var(--cyber-accent-glow);
+          background: #fff; border: 3px solid #cbd5e1;
           z-index: 1;
         }
-        .node-title { font-family: var(--font-display); font-size: 18px; font-weight: 800; color: var(--cyber-accent); margin-bottom: 12px; display: flex; alignItems: center; gap: 8px; letter-spacing: 1px; }
-        .node-content { font-size: 14px; color: var(--cyber-text); font-family: var(--font-mono); }
+        .node-title { font-size: 18px; font-weight: 800; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .node-content { font-size: 15px; color: #475569; }
         
-        .node-0::before { border-color: var(--cyber-warning); box-shadow: 0 0 10px rgba(255, 183, 3, 0.5); }
-        .node-1::before { border-color: var(--cyber-accent); }
-        .node-2::before { border-color: var(--cyber-success); box-shadow: var(--cyber-success-glow); }
+        .node-0::before { border-color: #f59e0b; }
+        .node-1::before { border-color: #3b82f6; }
+        .node-2::before { border-color: #10b981; }
         
-        .node-0 { border-top: 2px solid var(--cyber-warning); }
-        .node-1 { border-top: 2px solid var(--cyber-accent); }
-        .node-2 { border-top: 2px solid var(--cyber-success); }
+        .node-0 { border-top: 4px solid #f59e0b; }
+        .node-1 { border-top: 4px solid #3b82f6; }
+        .node-2 { border-top: 4px solid #10b981; }
       `}</style>
 
       <div style={{ marginBottom: 32 }}>
-        <h1 style={{ fontSize: 24, color: 'var(--cyber-accent)', textShadow: 'var(--cyber-accent-glow)', margin: 0 }}>AI_LEARNING_PATH</h1>
-        <p style={{ color: "var(--cyber-text-muted)", fontFamily: 'var(--font-mono)', fontSize: 12, letterSpacing: 1, margin: "4px 0 0" }}>
-          PERSONALIZED_RECOVERY_PROTOCOL
-        </p>
+        <h1 style={{ fontSize: 28, fontWeight: 800, color: '#1e293b', margin: '0 0 8px 0' }}>Lộ trình học tập AI</h1>
+        <p style={{ color: '#64748b', margin: 0 }}>Đề xuất giải pháp cá nhân hóa giúp cải thiện điểm số và vượt qua môn học.</p>
       </div>
 
       {!roadmapData && (
-        <div className="cyber-card">
-          <h2 style={{ fontSize: 16, fontFamily: 'var(--font-display)', marginBottom: 20, display: "flex", alignItems: "center", gap: 8, color: "var(--cyber-accent)" }}>
-            <MdAutoAwesome size={24} />
-            INITIALIZE_NEW_PATH
+        <div className="uni-card" style={{ padding: 32 }}>
+          <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 24, display: "flex", alignItems: "center", gap: 8, color: "#1e293b" }}>
+            <MdAutoAwesome size={24} color="#2563eb" />
+            Tạo lộ trình học tập mới
           </h2>
           
-          <form onSubmit={handleGenerate} style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-            <div style={{ display: "flex", gap: 20 }}>
+          <form onSubmit={handleGenerate} style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+            <div style={{ display: "flex", gap: 24 }}>
               <div style={{ flex: 1 }}>
-                <label className="tech-label" style={{ display: "block", marginBottom: 8 }}>STUDENT_ID</label>
-                <input type="text" value={mssv} disabled className="cyber-input" style={{ opacity: 0.7 }} />
+                <label style={{ display: "block", marginBottom: 8, fontSize: 14, fontWeight: 600, color: "#475569" }}>Mã số sinh viên</label>
+                <input type="text" value={mssv} disabled style={{ width: '100%', padding: '12px 16px', borderRadius: 8, border: '1px solid #cbd5e1', background: '#f1f5f9', color: '#64748b' }} />
               </div>
               <div style={{ flex: 1 }}>
-                <label className="tech-label" style={{ display: "block", marginBottom: 8 }}>MAJOR</label>
-                <input type="text" value={nganh} disabled className="cyber-input" style={{ opacity: 0.7 }} />
+                <label style={{ display: "block", marginBottom: 8, fontSize: 14, fontWeight: 600, color: "#475569" }}>Chuyên ngành</label>
+                <input type="text" value={nganh} disabled style={{ width: '100%', padding: '12px 16px', borderRadius: 8, border: '1px solid #cbd5e1', background: '#f1f5f9', color: '#64748b' }} />
               </div>
             </div>
 
             <div>
-              <label className="tech-label" style={{ display: "block", marginBottom: 8 }}>TARGET_SUBJECT *</label>
+              <label style={{ display: "block", marginBottom: 8, fontSize: 14, fontWeight: 600, color: "#475569" }}>Môn học cần cải thiện <span style={{color: '#dc2626'}}>*</span></label>
               <input 
                 type="text" 
-                value={monHoc || "DATA_MISSING_PLEASE_UPDATE_CORE"} 
-                disabled 
-                className="cyber-input"
-                style={{ opacity: 0.7, color: monHoc ? "var(--cyber-accent)" : "var(--cyber-danger)" }}
+                value={monHoc} 
+                onChange={(e) => setMonHoc(e.target.value)}
+                placeholder="Ví dụ: Cơ sở dữ liệu nâng cao..." 
+                style={{ width: '100%', padding: '12px 16px', borderRadius: 8, border: '1px solid #cbd5e1', background: '#fff' }}
               />
             </div>
 
             <div>
-              <label className="tech-label" style={{ display: "block", marginBottom: 8 }}>DIFFICULTY_REASONS *</label>
+              <label style={{ display: "block", marginBottom: 8, fontSize: 14, fontWeight: 600, color: "#475569" }}>Khó khăn bạn đang gặp phải <span style={{color: '#dc2626'}}>*</span></label>
               <textarea 
                 value={lyDo} 
                 onChange={(e) => setLyDo(e.target.value)} 
-                placeholder="INPUT_FAILURE_METRICS (e.g., LACK_OF_MATERIALS, KNOWLEDGE_GAPS...)" 
-                className="cyber-input"
-                rows={3}
+                placeholder="Bạn hãy miêu tả cụ thể vì sao mình học chưa tốt môn này (Ví dụ: Thiếu tài liệu, mất căn bản, không hiểu thầy cô giảng...)" 
+                style={{ width: '100%', padding: '12px 16px', borderRadius: 8, border: '1px solid #cbd5e1', background: '#fff', resize: 'vertical' }}
+                rows={4}
                 required
               />
             </div>
 
             {error && (
-              <div style={{ background: "rgba(255, 0, 85, 0.1)", color: "var(--cyber-danger)", padding: "12px 16px", border: "1px solid var(--cyber-danger)", fontSize: 13, display: "flex", alignItems: "center", gap: 8, fontFamily: 'var(--font-mono)' }}>
+              <div style={{ background: "#fef2f2", color: "#dc2626", padding: "12px 16px", borderRadius: 8, border: "1px solid #fca5a5", fontSize: 14, display: "flex", alignItems: "center", gap: 8 }}>
                 <MdErrorOutline size={20} />
-                ERR: {error}
+                Lỗi: {error}
               </div>
             )}
 
             <button 
               type="submit" 
               disabled={loading}
-              className="cyber-btn cyber-btn-primary"
+              className="uni-btn"
               style={{
                 width: "100%", padding: "16px",
-                fontSize: 14, cursor: loading ? "not-allowed" : "pointer",
+                fontSize: 16, cursor: loading ? "not-allowed" : "pointer",
                 display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
                 opacity: loading ? 0.7 : 1
               }}
             >
               {loading ? (
-                <><div className="spinner" style={{ width: 20, height: 20, borderWidth: 2, borderColor: "var(--cyber-bg)", borderTopColor: "transparent" }} /> COMPUTING_PATH...</>
+                <><div className="spinner" style={{ width: 20, height: 20, borderWidth: 2, borderColor: "#fff", borderTopColor: "transparent" }} /> Đang phân tích lộ trình...</>
               ) : (
-                <><MdAutoAwesome size={20} /> GENERATE_PROTOCOL</>
+                <><MdAutoAwesome size={24} /> Tạo lộ trình</>
               )}
             </button>
           </form>
@@ -258,35 +256,35 @@ export default function LoTrinhHocTap() {
 
       {roadmapData && (
         <div style={{ animation: "fadeIn 0.5s ease" }}>
-          <div className="cyber-card" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px 24px", marginBottom: 24, background: "rgba(0, 240, 255, 0.05)" }}>
+          <div className="uni-card" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px 24px", marginBottom: 24, background: "#f8fafc" }}>
             <div>
-              <div className="tech-label">TARGET_SUBJECT</div>
-              <div style={{ fontSize: 18, fontFamily: 'var(--font-display)', color: "var(--cyber-text)", marginTop: 4 }}>{monHoc}</div>
+              <div style={{ fontSize: 13, color: '#64748b', fontWeight: 600 }}>Môn học cần cải thiện</div>
+              <div style={{ fontSize: 18, fontWeight: 800, color: "#1e293b", marginTop: 4 }}>{monHoc}</div>
             </div>
             <button 
               onClick={handleReset}
-              className="cyber-btn"
-              style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11 }}
+              className="uni-btn-outline"
+              style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 14, padding: "8px 16px" }}
             >
-              <MdRefresh size={16} /> RESET_PROTOCOL
+              <MdRefresh size={18} /> Tạo lộ trình mới
             </button>
           </div>
 
           <div className="roadmap-container">
             {/* Node 0: Lời khuyên */}
             <div className="roadmap-node node-0" style={{ animationDelay: "0.1s" }}>
-              <div className="node-title" style={{ color: "var(--cyber-warning)" }}>
-                <MdAutoAwesome size={24} /> NODE_00 // SYSTEM_ADVICE
+              <div className="node-title" style={{ color: "#d97706" }}>
+                <MdAutoAwesome size={24} /> Lời khuyên từ chuyên gia AI
               </div>
-              <div className="node-content" style={{ lineHeight: 1.6, color: "var(--cyber-text-muted)" }}>
+              <div className="node-content" style={{ lineHeight: 1.6 }}>
                 {roadmapData.loi_khuyen}
               </div>
             </div>
 
             {/* Node 1: Tuần 1 */}
             <div className="roadmap-node node-1" style={{ animationDelay: "0.2s" }}>
-              <div className="node-title">
-                <MdSchool size={24} /> NODE_01 // PHASE_ONE
+              <div className="node-title" style={{ color: "#2563eb" }}>
+                <MdSchool size={24} /> Kế hoạch Tuần 1
               </div>
               <div className="node-content">
                 <MindMapBoxes text={roadmapData.tuan_1} type="primary" />
@@ -295,8 +293,8 @@ export default function LoTrinhHocTap() {
 
             {/* Node 2: Tuần 2 */}
             <div className="roadmap-node node-2" style={{ animationDelay: "0.3s" }}>
-              <div className="node-title" style={{ color: "var(--cyber-success)" }}>
-                <MdSchool size={24} /> NODE_02 // PHASE_TWO
+              <div className="node-title" style={{ color: "#16a34a" }}>
+                <MdSchool size={24} /> Kế hoạch Tuần 2
               </div>
               <div className="node-content">
                 <MindMapBoxes text={roadmapData.tuan_2} type="success" />

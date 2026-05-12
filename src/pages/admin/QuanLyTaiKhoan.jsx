@@ -173,7 +173,7 @@ export default function QuanLyTaiKhoan() {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+          gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
           gap: 16,
           marginTop: 20,
           marginBottom: 20,
@@ -194,23 +194,6 @@ export default function QuanLyTaiKhoan() {
           </div>
           <div style={{ fontSize: 28, fontWeight: 800 }}>
             {svCount.toLocaleString()}
-          </div>
-        </div>
-        <div className="card card-body">
-          <div
-            style={{
-              fontSize: 11,
-              fontWeight: 700,
-              textTransform: "uppercase",
-              letterSpacing: 1,
-              color: "var(--text-secondary)",
-              marginBottom: 8,
-            }}
-          >
-            Tài khoản Cố vấn
-          </div>
-          <div style={{ fontSize: 28, fontWeight: 800 }}>
-            {covanCount.toLocaleString()}
           </div>
         </div>
         <div className="card card-body">
@@ -273,7 +256,6 @@ export default function QuanLyTaiKhoan() {
           {[
             ["all", "Tất cả"],
             ["admin", "Admin"],
-            ["covan", "Cố vấn"],
             ["sinhvien", "Sinh viên"],
           ].map(([v, l]) => (
             <button
@@ -641,14 +623,13 @@ export default function QuanLyTaiKhoan() {
                   }
                 >
                   <option value="admin">Admin</option>
-                  <option value="covan">Cố vấn</option>
                   <option value="sinhvien">Sinh viên</option>
                 </select>
               </div>
               <div
                 style={{
                   display: "grid",
-                  gridTemplateColumns: "1fr 1fr",
+                  gridTemplateColumns: "1fr",
                   gap: 12,
                 }}
               >
@@ -670,29 +651,6 @@ export default function QuanLyTaiKhoan() {
                         : setEditData((d) => ({
                             ...d,
                             MSSV_LienKet: e.target.value,
-                          }))
-                    }
-                  />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">ID Cố vấn LK</label>
-                  <input
-                    className="form-control"
-                    type="number"
-                    value={
-                      modal === "add"
-                        ? form.Id_CoVan_LienKet
-                        : editData.Id_CoVan_LienKet || ""
-                    }
-                    onChange={(e) =>
-                      modal === "add"
-                        ? setForm((f) => ({
-                            ...f,
-                            Id_CoVan_LienKet: e.target.value,
-                          }))
-                        : setEditData((d) => ({
-                            ...d,
-                            Id_CoVan_LienKet: e.target.value,
                           }))
                     }
                   />

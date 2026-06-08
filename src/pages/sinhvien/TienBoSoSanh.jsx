@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { getProgress, getExercises, getTamLyStats, getExerciseHistory } from "../../services/api";
 import {
-  MdTrendingUp, MdTrendingDown, MdRemove, MdRefresh, MdWarningAmber, MdCheckCircle
+  MdTrendingUp, MdRefresh, MdWarningAmber, MdCheckCircle
 } from "react-icons/md";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
@@ -24,84 +24,7 @@ const FEATURE_LABELS = {
 
 const LOWER_IS_BETTER = ["tre_hoc"];
 
-function CompareTable({ history }) {
-  if (history.length < 2) return null;
-  const first = history[0];
-  const last = history[history.length - 1];
-  if (!first.features || !last.features) return null;
 
-  const rows = Object.keys(FEATURE_LABELS).map(key => {
-    const v1 = first.features?.[key];
-    const v2 = last.features?.[key];
-    const isNumeric = typeof v1 === "number";
-    let changed = false, improved = null;
-    if (isNumeric && v1 !== null && v2 !== null) {
-      changed = v1 !== v2;
-      const better = LOWER_IS_BETTER.includes(key) ? v2 < v1 : v2 > v1;
-      if (changed) improved = better;
-    }
-    return { key, label: FEATURE_LABELS[key], v1, v2, isNumeric, changed, improved };
-  });
-
-  return (
-    <div className="uni-card" style={{ padding: 0, overflow: 'hidden' }}>
-      <div style={{ padding: "20px 24px", borderBottom: "1px solid #e2e8f0", display: "flex", justifyContent: "space-between", alignItems: "center", background: "#f8fafc" }}>
-        <div>
-          <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: "#1e293b" }}>So sánh các chỉ số</h3>
-          <p style={{ margin: "4px 0 0", fontSize: 13, color: "#64748b" }}>Đối chiếu dữ liệu ban đầu và hiện tại</p>
-        </div>
-        <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
-          {[{ c: "#16a34a", l: "Cải thiện" }, { c: "#dc2626", l: "Suy giảm" }, { c: "#94a3b8", l: "Giữ nguyên" }].map((t, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <div style={{ width: 10, height: 10, borderRadius: '50%', background: t.c }} />
-              <span style={{ fontSize: 13, fontWeight: 600, color: "#475569" }}>{t.l}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-      <div style={{ overflowX: "auto" }}>
-        <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
-          <thead>
-            <tr style={{ background: "#f1f5f9" }}>
-              {["TIÊU CHÍ ĐÁNH GIÁ", "DỮ LIỆU BAN ĐẦU", "DỮ LIỆU HIỆN TẠI", "MỨC ĐỘ THAY ĐỔI"].map((h, i) => (
-                <th key={h} style={{ padding: "16px 24px", fontSize: 12, fontWeight: 700, color: "#475569", letterSpacing: 0.5, borderBottom: "2px solid #e2e8f0" }}>{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((r, i) => {
-              const delta = r.isNumeric && r.v1 !== null && r.v2 !== null ? r.v2 - r.v1 : null;
-              const rowBg = r.improved === true ? "#f0fdf4" : r.improved === false ? "#fef2f2" : "#fff";
-              return (
-                <tr key={r.key} style={{ background: rowBg, borderBottom: "1px solid #e2e8f0" }}>
-                  <td style={{ padding: "16px 24px", fontSize: 14, fontWeight: 600, color: "#334155" }}>{r.label}</td>
-                  <td style={{ padding: "16px 24px", fontSize: 14, color: "#64748b" }}>
-                    {r.v1 !== null ? (r.isNumeric ? Number(r.v1).toFixed(r.key === "diem_qua_trinh" ? 1 : 0) : r.v1) : "—"}
-                  </td>
-                  <td style={{ padding: "16px 24px", fontSize: 14, fontWeight: 700, color: "#1e293b" }}>
-                    {r.v2 !== null ? (r.isNumeric ? Number(r.v2).toFixed(r.key === "diem_qua_trinh" ? 1 : 0) : r.v2) : "—"}
-                  </td>
-                  <td style={{ padding: "16px 24px" }}>
-                    {delta !== null && r.changed ? (
-                      <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 14, fontWeight: 700, color: r.improved ? "#16a34a" : "#dc2626" }}>
-                        {r.improved ? <MdTrendingUp size={18} /> : <MdTrendingDown size={18} />}
-                        {delta > 0 ? "+" : ""}{delta.toFixed(r.key === "diem_qua_trinh" ? 1 : 0)}
-                      </span>
-                    ) : (
-                      <span style={{ color: "#94a3b8", fontSize: 13, display: "flex", alignItems: "center", gap: 6, fontWeight: 500 }}>
-                        <MdRemove size={16} /> Không đổi
-                      </span>
-                    )}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-}
 
 export default function TienBoSoSanh() {
   const { user } = useAuth();
@@ -110,6 +33,7 @@ export default function TienBoSoSanh() {
   const [loading, setLoading] = useState(true);
   const [tamLyStats, setTamLyStats] = useState(null);
   const [exHistory, setExHistory] = useState([]);
+  const [selectedSession, setSelectedSession] = useState(null); // index lần làm được chọn
   const mssv = user?.linked_id;
 
   const load = async () => {
@@ -203,93 +127,264 @@ export default function TienBoSoSanh() {
       )}
 
       {/* Thống kê bài tập */}
-      {exercises && exercises.done_count > 0 && (
+      {(exercises && exercises.done_count > 0) || exHistory.length > 0 ? (() => {
+        // Tính tổng tất cả các lần làm bài
+        const totalDone  = exHistory.length > 0
+          ? exHistory.reduce((sum, s) => sum + (s.total || 0), 0)
+          : exercises?.done_count || 0;
+        const totalRight = exHistory.length > 0
+          ? exHistory.reduce((sum, s) => sum + (s.correct || 0), 0)
+          : exercises?.correct_count || 0;
+        const totalPct   = totalDone > 0
+          ? Math.round((totalRight / totalDone) * 1000) / 10
+          : 0;
+
+        return (
         <div className="uni-card" style={{ padding: 32, marginBottom: 32 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
             <h3 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: "#1e293b" }}>Thống kê rèn luyện AI</h3>
-            {exercises.done_count >= 2 && exercises.score_percent >= 80 && (
+            {totalPct >= 80 && totalDone >= 2 && (
               <span className="uni-badge uni-badge-success" style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, padding: "6px 12px" }}>
-                <MdCheckCircle size={16} /> Đánh giá: Tiến bộ hơn
+                <MdCheckCircle size={16} /> Đánh giá: Tiến bộ tốt
               </span>
             )}
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 24 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 20 }}>
+            {/* Ô 1: Tổng câu đã làm (tất cả lần) */}
             <div style={{ background: "#eff6ff", borderRadius: 12, padding: 24, border: "1px solid #bfdbfe", textAlign: "center" }}>
-              <div style={{ fontSize: 14, fontWeight: 600, color: "#3b82f6", marginBottom: 8 }}>BÀI TẬP ĐÃ LÀM</div>
-              <div style={{ fontSize: 36, fontWeight: 800, color: "#1d4ed8" }}>{exercises.done_count}</div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: "#3b82f6", marginBottom: 4 }}>BÀI TẬP ĐÃ LÀM</div>
+              <div style={{ fontSize: 11, color: "#93c5fd", marginBottom: 8 }}>tất cả các lần</div>
+              <div style={{ fontSize: 36, fontWeight: 800, color: "#1d4ed8" }}>{totalDone}</div>
             </div>
+            {/* Ô 2: Tổng câu đúng */}
             <div style={{ background: "#f0fdf4", borderRadius: 12, padding: 24, border: "1px solid #bbf7d0", textAlign: "center" }}>
-              <div style={{ fontSize: 14, fontWeight: 600, color: "#10b981", marginBottom: 8 }}>TRẢ LỜI ĐÚNG</div>
-              <div style={{ fontSize: 36, fontWeight: 800, color: "#047857" }}>{exercises.correct_count}</div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: "#10b981", marginBottom: 4 }}>TRẢ LỜI ĐÚNG</div>
+              <div style={{ fontSize: 11, color: "#6ee7b7", marginBottom: 8 }}>tất cả các lần</div>
+              <div style={{ fontSize: 36, fontWeight: 800, color: "#047857" }}>{totalRight}</div>
             </div>
-            <div style={{ background: exercises.score_percent >= 75 ? "#f0fdf4" : "#fffbeb", borderRadius: 12, padding: 24, border: `1px solid ${exercises.score_percent >= 75 ? "#bbf7d0" : "#fde68a"}`, textAlign: "center" }}>
-              <div style={{ fontSize: 14, fontWeight: 600, color: exercises.score_percent >= 75 ? "#10b981" : "#d97706", marginBottom: 8 }}>TỶ LỆ CHÍNH XÁC</div>
-              <div style={{ fontSize: 36, fontWeight: 800, color: exercises.score_percent >= 75 ? "#047857" : "#b45309" }}>{exercises.score_percent}%</div>
+            {/* Ô 3: Tỷ lệ chung */}
+            <div style={{ background: totalPct >= 75 ? "#f0fdf4" : "#fffbeb", borderRadius: 12, padding: 24, border: `1px solid ${totalPct >= 75 ? "#bbf7d0" : "#fde68a"}`, textAlign: "center" }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: totalPct >= 75 ? "#10b981" : "#d97706", marginBottom: 4 }}>TỶ LỆ CHÍNH XÁC</div>
+              <div style={{ fontSize: 11, color: "#94a3b8", marginBottom: 8 }}>tổng hợp</div>
+              <div style={{ fontSize: 36, fontWeight: 800, color: totalPct >= 75 ? "#047857" : "#b45309" }}>{totalPct}%</div>
             </div>
+            {/* Ô 4: Số lần làm — click để xem chi tiết */}
+            {exHistory.length > 0 && (
+              <div
+                onClick={() => setSelectedSession(selectedSession !== null ? null : 0)}
+                style={{
+                  background: selectedSession !== null ? "#f5f3ff" : "#faf5ff",
+                  borderRadius: 12, padding: 24,
+                  border: `2px solid ${selectedSession !== null ? "#7c3aed" : "#ddd6fe"}`,
+                  textAlign: "center", cursor: "pointer",
+                  transition: "all 0.2s",
+                  boxShadow: selectedSession !== null ? "0 0 0 3px #ede9fe" : "none",
+                }}
+              >
+                <div style={{ fontSize: 13, fontWeight: 600, color: "#7c3aed", marginBottom: 8 }}>SỐ LẦN LÀM BÀI</div>
+                <div style={{ fontSize: 36, fontWeight: 800, color: "#6d28d9" }}>{exHistory.length}</div>
+                <div style={{ fontSize: 11, color: "#a78bfa", marginTop: 6 }}>
+                  {selectedSession !== null ? "▲ Đang xem chi tiết" : "▼ Bấm để xem chi tiết"}
+                </div>
+              </div>
+            )}
           </div>
-        </div>
-      )}
 
-      {/* Improvement banner */}
-      {improvement && (
-        <div style={{
-          borderRadius: 12, padding: 32, marginBottom: 32,
-          background: improvement.is_improved ? "#f0fdf4" : "#fef2f2",
-          border: `1px solid ${improvement.is_improved ? "#bbf7d0" : "#fca5a5"}`,
-        }}>
-          <div style={{ display: "flex", alignItems: "flex-start", gap: 20 }}>
-            <div style={{ padding: 16, background: improvement.is_improved ? "#16a34a" : "#dc2626", borderRadius: "50%", color: "#fff", display: "flex" }}>
-              {improvement.is_improved ? <MdTrendingUp size={32} /> : <MdTrendingDown size={32} />}
+          {/* Panel chi tiết từng lần làm */}
+          {selectedSession !== null && exHistory.length > 0 && (
+            <div style={{ marginTop: 24, border: "1px solid #ede9fe", borderRadius: 12, overflow: "hidden" }}>
+              <div style={{ background: "#f5f3ff", padding: "12px 20px", borderBottom: "1px solid #ede9fe", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <span style={{ fontWeight: 700, fontSize: 14, color: "#5b21b6" }}>📋 Chi tiết từng lần làm bài</span>
+                <button
+                  onClick={() => setSelectedSession(null)}
+                  style={{ background: "none", border: "none", cursor: "pointer", color: "#7c3aed", fontWeight: 700, fontSize: 18, lineHeight: 1 }}
+                >×</button>
+              </div>
+              {/* Danh sách lần làm */}
+              <div style={{ display: "flex", gap: 0, overflowX: "auto", borderBottom: "1px solid #ede9fe" }}>
+                {exHistory.map((s, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setSelectedSession(i)}
+                    style={{
+                      padding: "10px 20px", border: "none", borderRight: "1px solid #ede9fe",
+                      background: selectedSession === i ? "#7c3aed" : "#fff",
+                      color: selectedSession === i ? "#fff" : "#6d28d9",
+                      cursor: "pointer", fontWeight: 700, fontSize: 13, whiteSpace: "nowrap",
+                      transition: "all 0.15s",
+                    }}
+                  >
+                    {s.name}
+                  </button>
+                ))}
+              </div>
+              {/* Chi tiết lần được chọn */}
+              {(() => {
+                const s = exHistory[selectedSession];
+                return (
+                  <div style={{ padding: 24, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 16 }}>
+                    <div style={{ background: "#f8fafc", borderRadius: 10, padding: 20, textAlign: "center", border: "1px solid #e2e8f0" }}>
+                      <div style={{ fontSize: 12, fontWeight: 600, color: "#64748b", marginBottom: 6 }}>TỔNG CÂU</div>
+                      <div style={{ fontSize: 32, fontWeight: 800, color: "#1e293b" }}>{s.total}</div>
+                    </div>
+                    <div style={{ background: "#f0fdf4", borderRadius: 10, padding: 20, textAlign: "center", border: "1px solid #bbf7d0" }}>
+                      <div style={{ fontSize: 12, fontWeight: 600, color: "#10b981", marginBottom: 6 }}>✅ TRẢ LỜI ĐÚNG</div>
+                      <div style={{ fontSize: 32, fontWeight: 800, color: "#047857" }}>{s.correct}</div>
+                    </div>
+                    <div style={{ background: "#fef2f2", borderRadius: 10, padding: 20, textAlign: "center", border: "1px solid #fca5a5" }}>
+                      <div style={{ fontSize: 12, fontWeight: 600, color: "#ef4444", marginBottom: 6 }}>❌ TRẢ LỜI SAI</div>
+                      <div style={{ fontSize: 32, fontWeight: 800, color: "#b91c1c" }}>{s.wrong}</div>
+                    </div>
+                    <div style={{
+                      background: s.score >= 80 ? "#f0fdf4" : s.score >= 60 ? "#fffbeb" : "#fef2f2",
+                      borderRadius: 10, padding: 20, textAlign: "center",
+                      border: `1px solid ${s.score >= 80 ? "#bbf7d0" : s.score >= 60 ? "#fde68a" : "#fca5a5"}`
+                    }}>
+                      <div style={{ fontSize: 12, fontWeight: 600, color: s.score >= 80 ? "#10b981" : s.score >= 60 ? "#d97706" : "#ef4444", marginBottom: 6 }}>TỶ LỆ ĐÚNG</div>
+                      <div style={{ fontSize: 32, fontWeight: 800, color: s.score >= 80 ? "#047857" : s.score >= 60 ? "#b45309" : "#b91c1c" }}>{s.score}%</div>
+                      <div style={{ fontSize: 11, marginTop: 4, color: "#64748b" }}>
+                        {s.score >= 80 ? "🏆 Xuất sắc" : s.score >= 60 ? "📚 Khá" : "💪 Cần cố gắng"}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
+          )}
+        </div>
+        );
+      })() : null}
+
+      {/* Biểu đồ đánh giá qua từng lần làm bài ôn luyện */}
+      {exHistory.length > 0 && (
+        <div className="uni-card" style={{ marginBottom: 32, padding: 32, background: "linear-gradient(135deg, #f8faff 0%, #f0f4ff 100%)", border: "1px solid #c7d2fe" }}>
+          {/* Header */}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 28 }}>
             <div>
-              <h2 style={{ margin: "0 0 8px", fontSize: 24, fontWeight: 800, color: improvement.is_improved ? "#15803d" : "#b91c1c" }}>
-                {improvement.is_improved
-                  ? `TUYỆT VỜI! MỨC ĐỘ RỦI RO ĐÃ GIẢM ${improvement.delta_percent}%`
-                  : `CẢNH BÁO! MỨC ĐỘ RỦI RO TĂNG THÊM ${Math.abs(improvement.delta_percent)}%`}
-              </h2>
-              <p style={{ margin: 0, color: "#475569", fontSize: 16, lineHeight: 1.5 }}>
-                Tỷ lệ rủi ro của bạn đã thay đổi từ <strong>{improvement.first_score}%</strong> (ban đầu) thành <strong>{improvement.last_score}%</strong> (hiện tại) sau <strong>{improvement.sessions_count}</strong> lần đánh giá.
+              <h3 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: "#1e1b4b" }}>
+                📈 Đánh giá tiến bộ qua từng lần ôn luyện
+              </h3>
+              <p style={{ margin: "6px 0 0", fontSize: 13, color: "#6366f1" }}>
+                Biểu đồ tỷ lệ trả lời đúng của bài tập ôn luyện kiến thức
               </p>
             </div>
+            {/* Badge tổng quát */}
+            {(() => {
+              const last = exHistory[exHistory.length - 1]?.score ?? 0;
+              const trend = exHistory.length >= 2
+                ? exHistory[exHistory.length - 1].score - exHistory[0].score
+                : null;
+              return (
+                <div style={{ textAlign: "right" }}>
+                  <div style={{
+                    display: "inline-flex", alignItems: "center", gap: 8, padding: "8px 16px",
+                    borderRadius: 30, fontWeight: 700, fontSize: 13,
+                    background: last >= 80 ? "#dcfce7" : last >= 60 ? "#fef9c3" : "#fee2e2",
+                    color: last >= 80 ? "#15803d" : last >= 60 ? "#a16207" : "#b91c1c",
+                    border: `1px solid ${last >= 80 ? "#86efac" : last >= 60 ? "#fde047" : "#fca5a5"}`,
+                  }}>
+                    <span style={{ fontSize: 16 }}>{last >= 80 ? "🏆" : last >= 60 ? "📚" : "💪"}</span>
+                    {last >= 80 ? "Xuất sắc" : last >= 60 ? "Khá tốt" : "Cần cố gắng"}
+                  </div>
+                  {trend !== null && (
+                    <div style={{ marginTop: 6, fontSize: 12, color: trend >= 0 ? "#16a34a" : "#dc2626", fontWeight: 600 }}>
+                      {trend >= 0 ? `▲ Tăng ${trend.toFixed(1)}%` : `▼ Giảm ${Math.abs(trend).toFixed(1)}%`} so với lần đầu
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
           </div>
-        </div>
-      )}
 
-      {/* Risk trend chart - line chart */}
-      {exHistory.length > 0 && (
-        <div className="uni-card" style={{ marginBottom: 32, padding: 32 }}>
-          <h3 style={{ margin: "0 0 24px", fontSize: 20, fontWeight: 700, color: "#1e293b" }}>Biểu đồ điểm số Bài tập AI</h3>
-          <div style={{ width: '100%', height: 300 }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={exHistory.map(s => ({
+          {/* Chart */}
+          <ResponsiveContainer width="100%" height={280}>
+            <LineChart
+              data={exHistory.map((s, i) => ({
                 name: s.name,
-                "Tỷ lệ chính xác": s.score
-              }))} margin={{ top: 10, right: 20, bottom: 10, left: -20 }}>
-                <CartesianGrid stroke="#e2e8f0" strokeDasharray="5 5" vertical={false} />
-                <XAxis dataKey="name" tick={{fill: '#64748b', fontSize: 13, fontWeight: 600}} axisLine={false} tickLine={false} dy={10} />
-                <YAxis tick={{fill: '#64748b', fontSize: 13, fontWeight: 600}} axisLine={false} tickLine={false} domain={[0, 100]} />
-                <Tooltip 
-                  contentStyle={{ borderRadius: 8, border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', fontWeight: 600 }}
-                  formatter={(value) => [`${value}%`, "Tỷ lệ chính xác"]}
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="Tỷ lệ chính xác" 
-                  stroke="#10b981" 
-                  strokeWidth={4} 
-                  activeDot={{ r: 8, fill: '#10b981', stroke: '#fff', strokeWidth: 2 }} 
-                  dot={{ r: 5, fill: '#fff', stroke: '#10b981', strokeWidth: 2 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
+                "Điểm (%)": s.score,
+                index: i + 1,
+              }))}
+              margin={{ top: 16, right: 24, bottom: 8, left: -10 }}
+            >
+              <defs>
+                <linearGradient id="lineGradient" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stopColor="#6366f1" />
+                  <stop offset="100%" stopColor="#10b981" />
+                </linearGradient>
+                <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#6366f1" stopOpacity={0.15} />
+                  <stop offset="100%" stopColor="#6366f1" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid stroke="#e0e7ff" strokeDasharray="4 4" vertical={false} />
+              <XAxis
+                dataKey="name"
+                tick={{ fill: "#6366f1", fontSize: 12, fontWeight: 600 }}
+                axisLine={false}
+                tickLine={false}
+                dy={10}
+              />
+              <YAxis
+                domain={[0, 100]}
+                tick={{ fill: "#64748b", fontSize: 12, fontWeight: 600 }}
+                axisLine={false}
+                tickLine={false}
+                tickFormatter={(v) => `${v}%`}
+              />
+              <Tooltip
+                contentStyle={{
+                  borderRadius: 12,
+                  border: "1px solid #c7d2fe",
+                  boxShadow: "0 8px 24px rgba(99,102,241,0.15)",
+                  fontWeight: 600,
+                  background: "#fff",
+                }}
+                formatter={(value) => {
+                  const label = value >= 80 ? "🏆 Xuất sắc" : value >= 60 ? "📚 Khá" : "💪 Cần cải thiện";
+                  return [`${value}%  ${label}`, "Tỷ lệ đúng"];
+                }}
+                labelStyle={{ color: "#4338ca", fontWeight: 700 }}
+              />
+              <Line
+                type="monotone"
+                dataKey="Điểm (%)"
+                stroke="url(#lineGradient)"
+                strokeWidth={3.5}
+                dot={(props) => {
+                  const { cx, cy, payload } = props;
+                  const score = payload["Điểm (%)"];
+                  const color = score >= 80 ? "#10b981" : score >= 60 ? "#f59e0b" : "#ef4444";
+                  return (
+                    <circle
+                      key={`dot-${cx}-${cy}`}
+                      cx={cx} cy={cy} r={7}
+                      fill="#fff"
+                      stroke={color}
+                      strokeWidth={3}
+                    />
+                  );
+                }}
+                activeDot={{ r: 10, fill: "#6366f1", stroke: "#fff", strokeWidth: 3 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+
+          {/* Legend màu điểm */}
+          <div style={{ display: "flex", gap: 20, marginTop: 20, flexWrap: "wrap" }}>
+            {[
+              { color: "#10b981", label: "Xuất sắc (≥ 80%)" },
+              { color: "#f59e0b", label: "Khá (60–79%)" },
+              { color: "#ef4444", label: "Cần cải thiện (< 60%)" },
+            ].map((item) => (
+              <div key={item.label} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <div style={{ width: 12, height: 12, borderRadius: "50%", background: item.color, border: "2px solid #fff", boxShadow: `0 0 0 2px ${item.color}44` }} />
+                <span style={{ fontSize: 12, fontWeight: 600, color: "#64748b" }}>{item.label}</span>
+              </div>
+            ))}
           </div>
         </div>
       )}
 
-      {/* Compare table */}
-      {history.length >= 2 && (
-        <CompareTable history={history} />
-      )}
     </div>
   );
 }

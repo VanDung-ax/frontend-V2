@@ -90,6 +90,12 @@ export default function QuanLySinhVien() {
   const [msg, setMsg] = useState(null);
   const [formError, setFormError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [toast, setToast] = useState(null); // { type: 'success'|'error', text: string }
+
+  const showToast = (type, text) => {
+    setToast({ type, text });
+    setTimeout(() => setToast(null), 3500);
+  };
   const itemsPerPage = 10;
 
   const getNganhOptionsForKhoa = (maKhoa) => [
@@ -197,8 +203,8 @@ export default function QuanLySinhVien() {
     setSaving(true);
     try {
       await addStudent(payload);
-      setMsg({ type: "success", text: "Thêm sinh viên thành công!" });
       setShowModal(false);
+      showToast("success", `✅ Thêm sinh viên "${payload.HoTen}" (${payload.MSSV}) thành công!`);
       await loadStudents();
     } catch (err) {
       const detail = err?.response?.data?.detail;
@@ -1384,27 +1390,8 @@ export default function QuanLySinhVien() {
                 ))}
               </div>
             ) : (
-              <button
-                className="btn btn-primary"
-                style={{ width: "100%", justifyContent: "center" }}
-                onClick={handleGetAdvice}
-                disabled={adviceLoading}
-              >
-                {adviceLoading
-                  ? "⚙️ Đang phân tích AI..."
-                  : "⚡ AI Tư vấn đề xuất"}
-              </button>
+              null
             )}
-            <p
-              style={{
-                textAlign: "center",
-                fontSize: 12,
-                color: "var(--text-secondary)",
-                marginTop: 8,
-              }}
-            >
-              Đề xuất gửi email can thiệp cho Phòng Đào Tạo
-            </p>
           </div>
         </>
       )}
@@ -1561,6 +1548,57 @@ export default function QuanLySinhVien() {
         </div>
       )}
       {/* HẾT PHẦN MODAL */}
+
+      {/* TOAST NOTIFICATION */}
+      {toast && (
+        <div
+          style={{
+            position: "fixed",
+            bottom: 32,
+            right: 32,
+            zIndex: 9999,
+            minWidth: 320,
+            maxWidth: 480,
+            background: toast.type === "success" ? "#052e16" : "#450a0a",
+            border: `1.5px solid ${toast.type === "success" ? "#16a34a" : "#dc2626"}`,
+            color: toast.type === "success" ? "#4ade80" : "#f87171",
+            borderRadius: 14,
+            padding: "16px 22px",
+            fontSize: 15,
+            fontWeight: 600,
+            boxShadow: "0 8px 32px rgba(0,0,0,0.35)",
+            display: "flex",
+            alignItems: "center",
+            gap: 12,
+            animation: "slideInToast 0.35s cubic-bezier(.4,0,.2,1)",
+          }}
+        >
+          <span style={{ fontSize: 22 }}>
+            {toast.type === "success" ? "✅" : "❌"}
+          </span>
+          <span style={{ flex: 1 }}>{toast.text}</span>
+          <button
+            onClick={() => setToast(null)}
+            style={{
+              background: "transparent",
+              border: "none",
+              color: "inherit",
+              cursor: "pointer",
+              fontSize: 18,
+              padding: "0 4px",
+              opacity: 0.7,
+            }}
+          >
+            ×
+          </button>
+        </div>
+      )}
+      <style>{`
+        @keyframes slideInToast {
+          from { opacity: 0; transform: translateY(30px) scale(0.97); }
+          to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+      `}</style>
     </div>
   );
 }

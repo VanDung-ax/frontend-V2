@@ -104,9 +104,9 @@ export const getProgress = (mssv) =>
 export const getExerciseHistory = (mssv) =>
   api.get(`/api/v2/exercises/history/${mssv}`);
 
-// ── Deprecated/Compatibility functions cho QuanLySinhVien ──────────────
+// ── Khoa & Lớp (dùng cho form thêm sinh viên) ──────────────────────────
 export const generateAdvice = () => Promise.resolve({ data: { advice: "" } });
-export const getKhoaList = () => Promise.resolve({ data: [] });
-export const getAssignData = () => Promise.resolve({ data: { lops: [] } });
+export const getKhoaList = () => api.get("/api/v2/student/khoa-list");
+export const getAssignData = (maKhoa) => api.get(`/api/v2/student/assign-data/${maKhoa}`);
 
 export default api;

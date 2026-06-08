@@ -36,6 +36,19 @@ const customStyles = `
   }
 `;
 
+// Xóa ký hiệu "biến thể" và "#..." khỏi text câu hỏi trước khi hiển thị
+const cleanQuestion = (text) => {
+  if (!text) return "";
+  return text
+    .replace(/\s*#\s*biến\s*thể\s*\d*/gi, "")        // # biến thể 2, #biến thể
+    .replace(/\s*\(\s*biến\s*thể\s*\d*\s*\)/gi, "")  // (biến thể 2)
+    .replace(/\s*biến\s*thể\s*#?\s*\d+/gi, "")        // biến thể 2, biến thể #3
+    .replace(/\s*#\d+/g, "")                           // #2, #3
+    .replace(/\s*#[^\n]*/g, "")                        // # ... bất kỳ
+    .replace(/\s*\(\s*\d*\s*\)/g, "")                 // () hoặc (2) còn sót
+    .trim();
+};
+
 function QuizCard({ question, index, selectedIdx, onSelect, result }) {
   const done = result !== undefined;
   const correctIdx = done ? result.correct_index : null;
@@ -47,7 +60,7 @@ function QuizCard({ question, index, selectedIdx, onSelect, result }) {
           Câu {index + 1} — Nhóm: {question.thuoc_tinh}
         </div>
         <p style={{ margin: 0, fontSize: 16, fontWeight: 600, color: "#1e293b", lineHeight: 1.6 }}>
-          {question.question}
+          {cleanQuestion(question.question)}
         </p>
       </div>
 
@@ -178,7 +191,7 @@ export default function BaiTapTest() {
         <div style={{ fontSize: 64, marginBottom: 24 }}>🧠</div>
         <h2 style={{ fontSize: 24, fontWeight: 700, color: "#1e293b", marginBottom: 16 }}>Sẵn sàng làm bài kiểm tra</h2>
         <p style={{ color: "#475569", marginBottom: 36, fontSize: 15, lineHeight: 1.6, maxWidth: 480, margin: "0 auto 36px" }}>
-          Hệ thống sẽ cung cấp 30 câu hỏi ngẫu nhiên được lựa chọn từ ngân hàng dữ liệu để phân tích chuyên sâu về trạng thái tâm lý và hành vi học tập của bạn.
+          Hệ thống sẽ cung cấp 20 câu hỏi ngẫu nhiên được lựa chọn từ ngân hàng dữ liệu để phân tích chuyên sâu về trạng thái tâm lý và hành vi học tập của bạn.
         </p>
         <button 
           onClick={startTest}
